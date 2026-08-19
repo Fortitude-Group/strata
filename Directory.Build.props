@@ -15,6 +15,10 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <AnalysisMode>Default</AnalysisMode>
+    <!-- Domain naming: binary-analysis terms carry underscores/keywords by convention
+         (e.g. X86_64, a `function` parameter). CA1707/CA1716 are interop-style rules we
+         deliberately waive; real correctness analyzers stay on. -->
+    <NoWarn>$(NoWarn);CA1707;CA1716</NoWarn>
 
     <!-- Shared identity -->
     <Company>Fortitude Omnis Group</Company>

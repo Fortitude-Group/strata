@@ -1,0 +1,12 @@
+<Project>
+
+  <!-- Chain the repo-root props, then relax analyzers that fight idiomatic test code. -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <!-- CA1859: prefer concrete return type for perf — irrelevant for test helpers returning interfaces. -->
+    <NoWarn>$(NoWarn);CA1859</NoWarn>
+  </PropertyGroup>
+
+</Project>

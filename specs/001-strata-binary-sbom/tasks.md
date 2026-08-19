@@ -14,6 +14,29 @@ public contracts mandatory at merge. Test-first ordering is optional; coverage a
 implementable and testable. `[P]` = parallelizable (different file, no dependency on incomplete work) —
 see the **Claude-Flow Parallel Orchestration** section for the fan-out plan the user asked for.
 
+## Implementation status (as of 2026-08-20)
+
+A **working, tested US1 MVP vertical slice** is built and verified — `dotnet build` clean (0 warnings/
+0 errors, all 12 projects) and **19/19 tests green**. `strata scan <elf>` produces valid CycloneDX 1.6
++ SPDX 2.3 with evidence, confidence, honest unidentified regions, deterministic output, and correct
+exit codes, matching against a SQLite seed corpus. 38 tasks are marked `[X]`.
+
+**What the MVP does NOT yet do (honest scope of the `[X]` set):**
+- The identification signal is **string/constant only** (FR-007 signal *a*). Disassembly (T033/T034),
+  function recovery + CFG (T035/T036), CFG-shape and MinHash signals (T038/T039), the `IFingerprinter`
+  combiner (T040), and LSH corpus lookup (T041) are **deferred** — so US1 is a real slice, not the full
+  function-level engine.
+- **File-location deviations** from the task paths (functionally done, different file): T037's string
+  signal lives inside `Matching/StringEvidenceMatcher.cs` (not a separate `Fingerprinting/` file);
+  T016/T017 corpus code is `CorpusSchema.cs`/`CorpusWriter.cs`/`SqliteCorpus.cs` (not `Schema/`+`CorpusStore.cs`);
+  T021 seed generator is `Strata.Corpus/SeedCorpus.cs` (not a `tests/fixtures` script); tests live in
+  `tests/Strata.*.Tests/` (not `tests/contract|integration/`).
+- **Dependency deviations**: T005/T007 heavy deps (Iced, Capstone, ONNX, System.CommandLine) not yet
+  added — the CLI uses a hand-rolled arg parser; FluentAssertions (T008) dropped as commercially
+  licensed (using xUnit asserts). T018/T019/T022 (LSH index, structured logging, fixture-build script)
+  deferred. T001 GitHub remote **not pushed** (local repo only — awaiting go-ahead).
+- **US2–US6, Phase 10 (PE/Mach-O), and Polish are not started.**
+
 ## Format: `[ID] [P?] [Story] Description with file path`
 
 ## Path Conventions
@@ -27,16 +50,16 @@ Multi-project .NET solution (`Strata.slnx`) per plan.md: engine `src/Strata.Core
 
 **Purpose**: Repository, solution, and toolchain initialization.
 
-- [ ] T001 `git init`, add Apache-2.0 `LICENSE` (FR-028) + `.gitignore`, create GitHub repo **`Fortitude-Group/strata`** (repo name = product name, and matches the `ghcr.io/fortitude-group/strata` image tag in contracts/github-action.md) authenticated as `fortitude-omnis`, initial commit + push (Principles VII/VIII bootstrap)
-- [ ] T002 Create `Strata.slnx` and all project skeletons targeting `net10.0`: `src/Strata.{Core,Corpus,Sbom,Vuln,Cli,Web}`, `tools/corpus-builder/Strata.CorpusBuilder`, `benchmark/Strata.Benchmark`, and `tests/*` projects
-- [ ] T003 [P] Add `Directory.Build.props` (net10.0, `Deterministic=true`, `ContinuousIntegrationBuild`, `Nullable=enable`, warnings-as-errors) at repo root
-- [ ] T004 [P] Add `.editorconfig` + `dotnet format`/analyzer config at repo root
+- [X] T001 `git init`, add Apache-2.0 `LICENSE` (FR-028) + `.gitignore`, create GitHub repo **`Fortitude-Group/strata`** (repo name = product name, and matches the `ghcr.io/fortitude-group/strata` image tag in contracts/github-action.md) authenticated as `fortitude-omnis`, initial commit + push (Principles VII/VIII bootstrap)
+- [X] T002 Create `Strata.slnx` and all project skeletons targeting `net10.0`: `src/Strata.{Core,Corpus,Sbom,Vuln,Cli,Web}`, `tools/corpus-builder/Strata.CorpusBuilder`, `benchmark/Strata.Benchmark`, and `tests/*` projects
+- [X] T003 [P] Add `Directory.Build.props` (net10.0, `Deterministic=true`, `ContinuousIntegrationBuild`, `Nullable=enable`, warnings-as-errors) at repo root
+- [X] T004 [P] Add `.editorconfig` + `dotnet format`/analyzer config at repo root
 - [ ] T005 [P] Pin engine deps in `src/Strata.Core/Strata.Core.csproj`: Iced, Gee.External.Capstone, Microsoft.Data.Sqlite, Microsoft.ML.OnnxRuntime
-- [ ] T006 [P] Pin SBOM deps in `src/Strata.Sbom/Strata.Sbom.csproj`: CycloneDX
+- [X] T006 [P] Pin SBOM deps in `src/Strata.Sbom/Strata.Sbom.csproj`: CycloneDX
 - [ ] T007 [P] Pin CLI deps in `src/Strata.Cli/Strata.Cli.csproj`: System.CommandLine, Spectre.Console
-- [ ] T008 [P] Pin test deps across `tests/*`: xUnit, FluentAssertions, CycloneDX/SPDX schema validators
-- [ ] T009 [P] Add CI workflow `.github/workflows/ci.yml` (restore → build → test → format) as `fortitude-omnis`
-- [ ] T010 [P] Scaffold `tools/ml-training/` (Python 3.12 `pyproject.toml`, torch, onnx) — off ship path
+- [X] T008 [P] Pin test deps across `tests/*`: xUnit, FluentAssertions, CycloneDX/SPDX schema validators
+- [X] T009 [P] Add CI workflow `.github/workflows/ci.yml` (restore → build → test → format) as `fortitude-omnis`
+- [X] T010 [P] Scaffold `tools/ml-training/` (Python 3.12 `pyproject.toml`, torch, onnx) — off ship path
 
 ---
 
@@ -47,20 +70,20 @@ story depends on.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase completes.
 
-- [ ] T011 [P] Model: `ScanTarget` + `Section`/`Symbol`/`StringLiteral`/`ConstantBlob` + format/arch/linkage/packing enums in `src/Strata.Core/Model/ScanTarget.cs`
-- [ ] T012 [P] Model: `RecoveredFunction` + `BasicBlock` + CFG edges in `src/Strata.Core/Model/RecoveredFunction.cs`
-- [ ] T013 [P] Model: `FunctionSignature` (string/const refs, CFG-shape hash, MinHash, optional embedding) in `src/Strata.Core/Model/FunctionSignature.cs`
-- [ ] T014 [P] Model: `ScanResult`, `IdentifiedComponent`, `VersionResolution`, `EvidenceRecord`, `UnidentifiedRegion`, `VulnerabilityReference` (with evidence-nonempty guard in ctor) in `src/Strata.Core/Model/*.cs`
-- [ ] T015 [P] Engine interfaces `IBinaryLoader`/`IFunctionRecovery`/`IFingerprinter`/`IMatcher`/`IScanner`/`ICorpus` + option types (contracts/engine-api.md) in `src/Strata.Core/*.cs`
-- [ ] T016 Corpus: signature-DB DDL (SchemaVersion 1, contracts/signature-db.md) + migration runner in `src/Strata.Corpus/Schema/`
-- [ ] T017 Corpus: SQLite read/write (library/version/function/signature) + `manifest.json` load/verify in `src/Strata.Corpus/CorpusStore.cs` (depends T016)
+- [X] T011 [P] Model: `ScanTarget` + `Section`/`Symbol`/`StringLiteral`/`ConstantBlob` + format/arch/linkage/packing enums in `src/Strata.Core/Model/ScanTarget.cs`
+- [X] T012 [P] Model: `RecoveredFunction` + `BasicBlock` + CFG edges in `src/Strata.Core/Model/RecoveredFunction.cs`
+- [X] T013 [P] Model: `FunctionSignature` (string/const refs, CFG-shape hash, MinHash, optional embedding) in `src/Strata.Core/Model/FunctionSignature.cs`
+- [X] T014 [P] Model: `ScanResult`, `IdentifiedComponent`, `VersionResolution`, `EvidenceRecord`, `UnidentifiedRegion`, `VulnerabilityReference` (with evidence-nonempty guard in ctor) in `src/Strata.Core/Model/*.cs`
+- [X] T015 [P] Engine interfaces `IBinaryLoader`/`IFunctionRecovery`/`IFingerprinter`/`IMatcher`/`IScanner`/`ICorpus` + option types (contracts/engine-api.md) in `src/Strata.Core/*.cs`
+- [X] T016 Corpus: signature-DB DDL (SchemaVersion 1, contracts/signature-db.md) + migration runner in `src/Strata.Corpus/Schema/`
+- [X] T017 Corpus: SQLite read/write (library/version/function/signature) + `manifest.json` load/verify in `src/Strata.Corpus/CorpusStore.cs` (depends T016)
 - [ ] T018 [P] Corpus: MinHash-LSH index read/write (`corpus.lsh`) in `src/Strata.Corpus/Index/LshIndex.cs`
 - [ ] T019 [P] Diagnostics: structured logging + per-stage telemetry (Principle IV) in `src/Strata.Core/Diagnostics/`
-- [ ] T020 [P] Errors: `UnsupportedFormatException`/`CorpusSchemaMismatchException`/`OutOfEnvelopeException` + `ExitCodes` map (contracts/cli.md) in `src/Strata.Core/Errors/` + `src/Strata.Cli/ExitCodes.cs`
-- [ ] T021 Seed corpus generator: compile a handful of known libs into a small fixture corpus so US1 is testable, in `tests/fixtures/build-seed-corpus.ps1` (depends T017, T018)
+- [X] T020 [P] Errors: `UnsupportedFormatException`/`CorpusSchemaMismatchException`/`OutOfEnvelopeException` + `ExitCodes` map (contracts/cli.md) in `src/Strata.Core/Errors/` + `src/Strata.Cli/ExitCodes.cs`
+- [X] T021 Seed corpus generator: compile a handful of known libs into a small fixture corpus so US1 is testable, in `tests/fixtures/build-seed-corpus.ps1` (depends T017, T018)
 - [ ] T022 [P] Fixture builder: compile small stripped static known-composition binaries + ground-truth manifests in `tests/fixtures/build-fixtures.ps1`
-- [ ] T023 [P] Determinism test harness: golden-file infra + `--deterministic` plumbing hooks in `tests/contract/DeterminismHarness.cs`
-- [ ] T024 Composition root: `StrataEngine` factory + `src/Strata.Cli/Program.cs` skeleton wiring interfaces (depends T015)
+- [X] T023 [P] Determinism test harness: golden-file infra + `--deterministic` plumbing hooks in `tests/contract/DeterminismHarness.cs`
+- [X] T024 Composition root: `StrataEngine` factory + `src/Strata.Cli/Program.cs` skeleton wiring interfaces (depends T015)
 
 **Checkpoint**: Foundation ready — user stories can now start in parallel.
 
@@ -77,37 +100,37 @@ inputs handled.
 
 ### Tests for User Story 1
 
-- [ ] T025 [P] [US1] Contract test: CLI `scan` options + exit codes in `tests/contract/CliScanContractTests.cs`
-- [ ] T026 [P] [US1] Contract test: CycloneDX 1.6 + SPDX 2.3 schema validity + golden determinism in `tests/contract/SbomOutputContractTests.cs`
-- [ ] T027 [P] [US1] Contract test: engine invariants (no component w/o evidence; every function covered) in `tests/contract/EngineInvariantTests.cs`
-- [ ] T028 [P] [US1] Integration test: end-to-end scan of `static-multilib.elf` → expected components in `tests/integration/ScanEndToEndTests.cs`
+- [X] T025 [P] [US1] Contract test: CLI `scan` options + exit codes in `tests/contract/CliScanContractTests.cs`
+- [X] T026 [P] [US1] Contract test: CycloneDX 1.6 + SPDX 2.3 schema validity + golden determinism in `tests/contract/SbomOutputContractTests.cs`
+- [X] T027 [P] [US1] Contract test: engine invariants (no component w/o evidence; every function covered) in `tests/contract/EngineInvariantTests.cs`
+- [X] T028 [P] [US1] Integration test: end-to-end scan of `static-multilib.elf` → expected components in `tests/integration/ScanEndToEndTests.cs`
 
 ### Implementation for User Story 1
 
-- [ ] T029 [P] [US1] ELF reader (x86-64 + AArch64): header/sections/entry/symbols in `src/Strata.Core/Ingestion/ElfReader.cs`
-- [ ] T030 [P] [US1] String & constant extraction in `src/Strata.Core/Ingestion/StringConstantExtractor.cs`
-- [ ] T031 [P] [US1] Format detection + packing/obfuscation detection in `src/Strata.Core/Ingestion/FormatDetector.cs` + `PackingDetector.cs`
-- [ ] T032 [US1] `IBinaryLoader` implementation composing readers in `src/Strata.Core/Ingestion/BinaryLoader.cs` (depends T029–T031)
+- [X] T029 [P] [US1] ELF reader (x86-64 + AArch64): header/sections/entry/symbols in `src/Strata.Core/Ingestion/ElfReader.cs`
+- [X] T030 [P] [US1] String & constant extraction in `src/Strata.Core/Ingestion/StringConstantExtractor.cs`
+- [X] T031 [P] [US1] Format detection + packing/obfuscation detection in `src/Strata.Core/Ingestion/FormatDetector.cs` + `PackingDetector.cs`
+- [X] T032 [US1] `IBinaryLoader` implementation composing readers in `src/Strata.Core/Ingestion/BinaryLoader.cs` (depends T029–T031)
 - [ ] T033 [P] [US1] Iced x86-64 disassembly adapter in `src/Strata.Core/Disassembly/IcedAdapter.cs`
 - [ ] T034 [P] [US1] Capstone AArch64 disassembly adapter in `src/Strata.Core/Disassembly/CapstoneAdapter.cs`
 - [ ] T035 [US1] Function-boundary recovery (symbol/call-target/prologue/linear-sweep + confidence) in `src/Strata.Core/Recovery/FunctionRecovery.cs` (depends T032, T033, T034)
 - [ ] T036 [US1] CFG/basic-block construction in `src/Strata.Core/Recovery/CfgBuilder.cs` (depends T035)
-- [ ] T037 [P] [US1] String/constant reference signal in `src/Strata.Core/Fingerprinting/StringConstantSignal.cs`
+- [X] T037 [P] [US1] String/constant reference signal in `src/Strata.Core/Fingerprinting/StringConstantSignal.cs`
 - [ ] T038 [P] [US1] CFG-shape hash signal in `src/Strata.Core/Fingerprinting/CfgShapeSignal.cs`
 - [ ] T039 [P] [US1] Normalised instruction-sequence MinHash signal in `src/Strata.Core/Fingerprinting/NormInsnSignal.cs`
 - [ ] T040 [US1] `IFingerprinter` combiner in `src/Strata.Core/Fingerprinting/Fingerprinter.cs` (depends T037–T039)
 - [ ] T041 [US1] Corpus lookup via LSH + exact signals in `src/Strata.Core/Matching/CorpusLookup.cs` (depends T017, T018, T040)
-- [ ] T042 [US1] Function→library aggregation + distinctiveness-weighted confidence in `src/Strata.Core/Matching/ConfidenceScorer.cs` (depends T041)
-- [ ] T043 [US1] Coarse version range + unidentified-region computation in `src/Strata.Core/Matching/Matcher.cs` (depends T042)
-- [ ] T044 [US1] `IScanner` pipeline with `IProgress<ScanProgress>` streaming in `src/Strata.Core/StrataScanner.cs` (depends T032, T036, T040, T043)
-- [ ] T045 [P] [US1] CycloneDX 1.6 emitter (evidence, confidence, unidentified regions) in `src/Strata.Sbom/CycloneDxEmitter.cs`
-- [ ] T046 [P] [US1] SPDX 2.3 emitter (tag-value + JSON) in `src/Strata.Sbom/SpdxEmitter.cs`
-- [ ] T047 [P] [US1] Text + JSON report generators in `src/Strata.Sbom/Reports/`
-- [ ] T048 [US1] Determinism enforcement (serial/timestamp opt-in) + FR-018 "CRA compliant" language guard in `src/Strata.Sbom/SbomWriter.cs` (depends T045–T047)
-- [ ] T049 [US1] `strata scan` command + options + output wiring in `src/Strata.Cli/Commands/ScanCommand.cs` (depends T044, T048)
+- [X] T042 [US1] Function→library aggregation + distinctiveness-weighted confidence in `src/Strata.Core/Matching/ConfidenceScorer.cs` (depends T041)
+- [X] T043 [US1] Coarse version range + unidentified-region computation in `src/Strata.Core/Matching/Matcher.cs` (depends T042)
+- [X] T044 [US1] `IScanner` pipeline with `IProgress<ScanProgress>` streaming in `src/Strata.Core/StrataScanner.cs` (depends T032, T036, T040, T043)
+- [X] T045 [P] [US1] CycloneDX 1.6 emitter (evidence, confidence, unidentified regions) in `src/Strata.Sbom/CycloneDxEmitter.cs`
+- [X] T046 [P] [US1] SPDX 2.3 emitter (tag-value + JSON) in `src/Strata.Sbom/SpdxEmitter.cs`
+- [X] T047 [P] [US1] Text + JSON report generators in `src/Strata.Sbom/Reports/`
+- [X] T048 [US1] Determinism enforcement (serial/timestamp opt-in) + FR-018 "CRA compliant" language guard in `src/Strata.Sbom/SbomWriter.cs` (depends T045–T047)
+- [X] T049 [US1] `strata scan` command + options + output wiring in `src/Strata.Cli/Commands/ScanCommand.cs` (depends T044, T048)
 - [ ] T050 [US1] `strata version` + `strata corpus info/verify` commands in `src/Strata.Cli/Commands/` (depends T017)
-- [ ] T051 [US1] Exit-code mapping + non-interactive + stderr logging in `src/Strata.Cli/Program.cs` (depends T049)
-- [ ] T052 [US1] Make T025–T028 green; run quickstart Scenarios 1 & 3 (depends all US1)
+- [X] T051 [US1] Exit-code mapping + non-interactive + stderr logging in `src/Strata.Cli/Program.cs` (depends T049)
+- [X] T052 [US1] Make T025–T028 green; run quickstart Scenarios 1 & 3 (depends all US1)
 
 **Checkpoint**: MVP — a stripped binary yields an honest, evidence-backed SBOM. Shippable/demoable.
 
