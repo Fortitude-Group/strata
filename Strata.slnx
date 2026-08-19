@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/benchmark/">
+    <Project Path="benchmark/Strata.Benchmark/Strata.Benchmark.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Strata.Cli/Strata.Cli.csproj" />
+    <Project Path="src/Strata.Core/Strata.Core.csproj" />
+    <Project Path="src/Strata.Corpus/Strata.Corpus.csproj" />
+    <Project Path="src/Strata.Sbom/Strata.Sbom.csproj" />
+    <Project Path="src/Strata.Vuln/Strata.Vuln.csproj" />
+    <Project Path="src/Strata.Web/Strata.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Strata.Cli.Tests/Strata.Cli.Tests.csproj" />
+    <Project Path="tests/Strata.Core.Tests/Strata.Core.Tests.csproj" />
+    <Project Path="tests/Strata.Corpus.Tests/Strata.Corpus.Tests.csproj" />
+    <Project Path="tests/Strata.Sbom.Tests/Strata.Sbom.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tools/" />
+  <Folder Name="/tools/corpus-builder/">
+    <Project Path="tools/corpus-builder/Strata.CorpusBuilder/Strata.CorpusBuilder.csproj" />
+  </Folder>
+</Solution>

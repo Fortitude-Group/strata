@@ -1,0 +1,17 @@
+[project]
+name = "strata-ml-training"
+version = "0.1.0"
+description = "Off-ship-path training of the Strata function-similarity model (PyTorch -> ONNX export). Never part of the shipped CLI (research.md R7)."
+requires-python = ">=3.12"
+dependencies = [
+    "torch>=2.4",
+    "onnx>=1.16",
+    "numpy>=2.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

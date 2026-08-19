@@ -1,0 +1,53 @@
+# .NET / C#
+bin/
+obj/
+*.user
+*.suo
+[Bb]uild/
+[Oo]ut/
+artifacts/
+*.nupkg
+project.lock.json
+
+# Single-file / AOT publish output
+publish/
+
+# Test / coverage
+[Tt]est[Rr]esults/
+coverage/
+*.trx
+*.coverage
+
+# Python (tools/ml-training)
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+*.onnx
+
+# Corpus / benchmark build artefacts (large, regenerated)
+strata-corpus-*/
+*.db
+*.db-shm
+*.db-wal
+*.lsh
+*.hnsw
+tests/fixtures/*.elf
+tests/fixtures/*.bin
+tests/fixtures/build/
+
+# Secrets / env
+.env
+.env.*
+*.pem
+*.key
+
+# IDE / OS
+.vs/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp

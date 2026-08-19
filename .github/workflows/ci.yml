@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    env:
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore Strata.slnx
+
+      - name: Build (warnings as errors)
+        run: dotnet build Strata.slnx -c Release --no-restore
+
+      - name: Test
+        run: dotnet test Strata.slnx -c Release --no-build --verbosity normal
+
+      - name: Format check
+        run: dotnet format Strata.slnx --verify-no-changes --verbosity diagnostic

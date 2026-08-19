@@ -1,0 +1,10 @@
+Strata — Binary-to-SBOM
+Copyright 2026 Fortitude Omnis Group
+
+This product includes software developed at Fortitude Omnis Group.
+
+Licensed under the Apache License, Version 2.0. See the LICENSE file.
+
+Strata identifies open-source components compiled into native binaries and
+produces evidence-backed SBOMs. Its output is evidence toward an SBOM; it does
+not make any product "CRA compliant" — compliance is the user's responsibility.

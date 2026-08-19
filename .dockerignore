@@ -1,0 +1,16 @@
+**/bin/
+**/obj/
+**/publish/
+.git/
+.gitignore
+.vs/
+.vscode/
+.idea/
+*.log
+.env
+.env.*
+tests/
+benchmark/
+tools/ml-training/
+strata-corpus-*/
+**/TestResults/
