@@ -1,0 +1,245 @@
+:root {
+    color-scheme: light dark;
+    --bg: #0b0e14;
+    --panel: #131722;
+    --border: #262c3a;
+    --text: #e6e9f0;
+    --muted: #9aa3b2;
+    --accent: #5b8cff;
+    --high: #35c46c;
+    --medium: #e6b400;
+    --low: #e0562f;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.page-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.wordmark {
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 0.02em;
+}
+
+.tagline {
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+main {
+    flex: 1;
+    max-width: 960px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.page-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+.intro {
+    color: var(--muted);
+    max-width: 70ch;
+}
+
+h1, h2, h3 {
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.sample-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.sample-card, .component-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.sample-card h3 {
+    margin-top: 0;
+}
+
+button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.evidence-toggle {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-top: 0.5rem;
+}
+
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+}
+
+.alert-error {
+    background: rgba(224, 86, 47, 0.15);
+    border: 1px solid var(--low);
+    color: var(--text);
+}
+
+.progress-bar {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    height: 10px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    background: var(--accent);
+    height: 100%;
+    transition: width 0.2s ease;
+}
+
+.progress-message {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.component-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.component-card {
+    border-left-width: 4px;
+    animation: reveal 0.25s ease;
+}
+
+.component-card.confidence-high {
+    border-left-color: var(--high);
+}
+
+.component-card.confidence-medium {
+    border-left-color: var(--medium);
+}
+
+.component-card.confidence-low {
+    border-left-color: var(--low);
+}
+
+@keyframes reveal {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.component-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: baseline;
+}
+
+.component-name {
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.component-version {
+    color: var(--muted);
+}
+
+.component-confidence {
+    margin-left: auto;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.component-license {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 0.25rem;
+}
+
+.evidence-list {
+    margin-top: 0.5rem;
+    padding-left: 1.25rem;
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.evidence-signal {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.evidence-strength {
+    color: var(--muted);
+}
+
+.unidentified-list, .warning-list {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.scan-meta {
+    color: var(--muted);
+    font-size: 0.8rem;
+}
+
+.sbom-output {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}

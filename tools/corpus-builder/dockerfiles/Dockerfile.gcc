@@ -1,0 +1,43 @@
+# Pinned gcc toolchain image for the reproducible corpus build matrix
+# (contracts/corpus-builder.md, contracts/signature-db.md manifest.json "toolchains").
+#
+# Build one image per target architecture by passing --build-arg TARGET_ARCH:
+#   docker build -f Dockerfile.gcc --build-arg TARGET_ARCH=x86_64  -t strata-corpus-gcc-x86_64  .
+#   docker build -f Dockerfile.gcc --build-arg TARGET_ARCH=aarch64 -t strata-corpus-gcc-aarch64 .
+#
+# Pinned by digest (not a floating tag) so a rebuild months later reproduces the same base layer —
+# part of the SC-009 reproducibility invariant. Replace the digest when deliberately bumping gcc,
+# and record the new digest in the corpus manifest's `toolchains[].imageDigest`.
+FROM debian:bookworm-20240701-slim@sha256:2bc5c236e9b262645a323e9088dfa3bb1ecb16cc75811daf40a23a824a1d5a6
+
+ARG TARGET_ARCH=x86_64
+ENV DEBIAN_FRONTEND=noninteractive
+
+# gcc 13.2 is Debian bookworm's default gcc-12... pin the exact package version explicitly so the
+# matrix is not at the mercy of apt's latest-in-suite drift.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        gcc-12=12.2.0-14 \
+        g++-12=12.2.0-14 \
+        gcc-12-aarch64-linux-gnu=12.2.0-14 \
+        make=4.3-4.1 \
+        binutils=2.40-2 \
+        ca-certificates=20230311 \
+        curl=7.88.1-10+deb12u8 \
+        xz-utils=5.4.1-0.2 \
+        && \
+    rm -rf /var/lib/apt/lists/* && \
+    ln -sf /usr/bin/gcc-12 /usr/bin/gcc && \
+    ln -sf /usr/bin/g++-12 /usr/bin/g++
+
+WORKDIR /build
+
+# The build matrix driver (external to this Dockerfile, run by CI) mounts one recipe's fetched
+# source tree at /build/src and drives:
+#   for opt in -O0 -O2 -O3 -Os; do
+#     CC="$( [ "$TARGET_ARCH" = aarch64 ] && echo aarch64-linux-gnu-gcc-12 || echo gcc )" \
+#     CFLAGS="$opt" ./configure && make -j"$(nproc)"
+#   done
+# Output binaries are collected per (recipe, version, compiler, opt, arch) and handed to
+# `Strata.CorpusBuilder build --binaries <dir>` for fingerprinting.
+ENTRYPOINT ["/bin/sh"]

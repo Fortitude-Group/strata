@@ -1,0 +1,164 @@
+name: Release
+
+# User Story 4 (CI integration): on a version tag, publish self-contained single-file `strata`
+# executables for the four supported RIDs and build (and, when registry creds are configured,
+# push) the runtime-free container image (contracts/github-action.md, FR-021).
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  DOTNET_VERSION: "10.0.x"
+  IMAGE_NAME: strata
+
+jobs:
+  # ---------------------------------------------------------------------
+  # Self-contained single-file executables for every supported RID.
+  # Cross-publish from one ubuntu-latest host — self-contained (non-R2R, non-trimmed) publish
+  # does not require building on the target OS.
+  # ---------------------------------------------------------------------
+  build-executables:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rid: [linux-x64, linux-arm64, win-x64, osx-arm64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore src/Strata.Cli/Strata.Cli.csproj -r ${{ matrix.rid }}
+
+      - name: Publish self-contained single-file (${{ matrix.rid }})
+        run: |
+          dotnet publish src/Strata.Cli/Strata.Cli.csproj \
+            -c Release \
+            -r ${{ matrix.rid }} \
+            --no-restore \
+            --self-contained true \
+            -p:PublishSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
+            -p:IncludeAllContentForSelfExtract=true \
+            -p:EnableCompressionInSingleFile=true \
+            -p:PublishTrimmed=false \
+            -o dist/${{ matrix.rid }}
+
+      # The published host executable takes the project's AssemblyName (`Strata.Cli`, unset in
+      # the .csproj — not ours to change here). Rename to the `strata` command name the
+      # contract/action expect.
+      - name: Rename executable to `strata`
+        shell: bash
+        run: |
+          cd dist/${{ matrix.rid }}
+          if [ "${{ matrix.rid }}" = "win-x64" ]; then
+            mv Strata.Cli.exe strata.exe
+          else
+            mv Strata.Cli strata
+          fi
+
+      - name: Smoke test (linux-x64 only — matches the build host)
+        if: matrix.rid == 'linux-x64'
+        run: |
+          chmod +x dist/linux-x64/strata
+          dist/linux-x64/strata version
+
+      - name: Package archive
+        shell: bash
+        run: |
+          cd dist/${{ matrix.rid }}
+          if [ "${{ matrix.rid }}" = "win-x64" ]; then
+            zip -r "../../strata-${{ github.ref_name }}-${{ matrix.rid }}.zip" strata.exe
+          else
+            chmod +x strata
+            tar -czf "../../strata-${{ github.ref_name }}-${{ matrix.rid }}.tar.gz" strata
+          fi
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: strata-${{ matrix.rid }}
+          path: strata-${{ github.ref_name }}-${{ matrix.rid }}.*
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------
+  # Attach the four executables to a GitHub Release for the tag.
+  # ---------------------------------------------------------------------
+  publish-release:
+    needs: build-executables
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist-artifacts
+          merge-multiple: true
+
+      - name: Create/update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist-artifacts/*
+          generate_release_notes: true
+
+  # ---------------------------------------------------------------------
+  # Runtime-free container image (contracts/github-action.md — "Container image").
+  # Always builds so the image is validated on every tag; the push is guarded and no-ops
+  # cleanly when no registry credentials are configured, so this workflow works out of the
+  # box on a fresh clone/fork without failing the job.
+  # ---------------------------------------------------------------------
+  build-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: |
+          docker build \
+            -f src/Strata.Cli/Dockerfile \
+            -t ${{ env.IMAGE_NAME }}:${{ github.ref_name }} \
+            .
+
+      - name: Smoke test (runtime-free container)
+        run: docker run --rm ${{ env.IMAGE_NAME }}:${{ github.ref_name }} version
+
+      # Guard: push requires a registry password secret. Without one configured this step
+      # (and the ones below it) simply no-op — the job still passes, image build is still
+      # validated. Set `secrets.REGISTRY_PASSWORD` (+ optionally `secrets.REGISTRY_USERNAME`
+      # and `vars.REGISTRY`, default ghcr.io) to enable pushing on future runs.
+      - name: Check for registry credentials
+        id: creds
+        run: |
+          if [ -n "${{ secrets.REGISTRY_PASSWORD }}" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::secrets.REGISTRY_PASSWORD not set — image built but not pushed (Principle X: no prod-affecting push without configured creds)."
+          fi
+
+      - name: Log in to registry
+        if: steps.creds.outputs.configured == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.REGISTRY || 'ghcr.io' }}
+          username: ${{ secrets.REGISTRY_USERNAME || github.actor }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Tag and push
+        if: steps.creds.outputs.configured == 'true'
+        run: |
+          REGISTRY="${{ vars.REGISTRY || 'ghcr.io' }}"
+          REPO="${REGISTRY}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}"
+          # Principle II: image tag pins tool + corpus version.
+          docker tag ${{ env.IMAGE_NAME }}:${{ github.ref_name }} "${REPO}:${{ github.ref_name }}"
+          docker tag ${{ env.IMAGE_NAME }}:${{ github.ref_name }} "${REPO}:latest"
+          docker push "${REPO}:${{ github.ref_name }}"
+          docker push "${REPO}:latest"

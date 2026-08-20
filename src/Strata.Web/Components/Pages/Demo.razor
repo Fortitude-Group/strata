@@ -1,0 +1,158 @@
+@page "/"
+
+<PageTitle>Strata demo</PageTitle>
+
+<h1>Scan a binary, see the evidence</h1>
+<p class="intro">
+    Pick a bundled sample or upload your own native binary (ELF, PE, or Mach-O; up to
+    @MaxUploadDisplay). Strata reports every identified library with the evidence and confidence
+    behind it, and reports the parts of the binary it could not attribute — nothing is claimed
+    without a basis.
+</p>
+
+<section class="samples" aria-label="Bundled samples">
+    <h2>Bundled samples</h2>
+    <div class="sample-grid">
+        @foreach (SampleBinary sample in DemoService.Samples)
+        {
+            <div class="sample-card">
+                <h3>@sample.DisplayName</h3>
+                <p>@sample.Description</p>
+                <button type="button" disabled="@_isBusy" @onclick="() => SelectSampleAsync(sample.Id)">
+                    Scan this sample
+                </button>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="upload" aria-label="Upload your own binary">
+    <h2>Or upload your own</h2>
+    <p>Uploads are processed in memory only and are never written to disk or retained (cap: @MaxUploadDisplay).</p>
+    <InputFile OnChange="OnFileSelectedAsync" disabled="@_isBusy" />
+</section>
+
+@if (_errorMessage is not null)
+{
+    <div class="alert alert-error" role="alert">@_errorMessage</div>
+}
+
+@if (_isBusy)
+{
+    <section class="progress-panel" aria-live="polite">
+        <h2>Scanning @_sourceName…</h2>
+        @if (_progress is { } p)
+        {
+            <div class="progress-bar">
+                <div class="progress-bar-fill" style="width:@((p.Fraction * 100).ToString("0.0"))%"></div>
+            </div>
+            <p class="progress-message">@p.Message</p>
+        }
+    </section>
+}
+
+@if (_result is { } result)
+{
+    <section class="results" aria-label="Scan results">
+        <h2>Identified components</h2>
+        @if (result.Components.Count == 0)
+        {
+            <p>No components from the demo corpus were identified in this binary.</p>
+        }
+        else
+        {
+            <ul class="component-list">
+                @for (int i = 0; i < _revealedCount; i++)
+                {
+                    int index = i;
+                    IdentifiedComponent component = result.Components[index];
+                    <li class="component-card @ConfidenceClass(component.Confidence)">
+                        <div class="component-summary">
+                            <span class="component-name">@component.LibraryName</span>
+                            <span class="component-version">@component.Version.Display</span>
+                            <span class="component-confidence">
+                                @ConfidenceLabel(component.Confidence) (@((component.Confidence * 100).ToString("0"))%)
+                            </span>
+                        </div>
+                        @if (component.KnownLicense is not null)
+                        {
+                            <div class="component-license">License: @component.KnownLicense</div>
+                        }
+                        <button type="button" class="evidence-toggle" @onclick="() => ToggleEvidence(index)">
+                            @(_expandedComponents.Contains(index) ? "Hide evidence" : "Show evidence")
+                            (@component.Evidence.Count)
+                        </button>
+                        @if (_expandedComponents.Contains(index))
+                        {
+                            <ul class="evidence-list">
+                                @foreach (EvidenceRecord evidence in component.Evidence)
+                                {
+                                    <li>
+                                        <span class="evidence-signal">@evidence.Signal</span> —
+                                        @evidence.Detail
+                                        <span class="evidence-strength">(strength @evidence.Strength.ToString("0.00"))</span>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+
+        @if (_detailsRevealed)
+        {
+            <h2>Unidentified regions</h2>
+            @if (result.UnidentifiedRegions.Count == 0)
+            {
+                <p>Every recovered region was attributed to an identified component.</p>
+            }
+            else
+            {
+                <ul class="unidentified-list">
+                    @foreach (UnidentifiedRegion region in result.UnidentifiedRegions)
+                    {
+                        <li>
+                            0x@(region.StartAddress.ToString("X")) – 0x@(region.EndAddress.ToString("X")):
+                            @region.Reason
+                            @if (region.FunctionIds.Count > 0)
+                            {
+                                <span>(@region.FunctionIds.Count function(s))</span>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+
+            @if (result.Warnings.Count > 0)
+            {
+                <h2>Warnings</h2>
+                <ul class="warning-list">
+                    @foreach (string warning in result.Warnings)
+                    {
+                        <li>@warning</li>
+                    }
+                </ul>
+            }
+
+            <p class="scan-meta">
+                Corpus version @result.CorpusVersion · Strata @result.ToolVersion
+            </p>
+
+            <button type="button" @onclick="ToggleSbom">
+                @(_showSbom ? "Hide" : "Show") SBOM (CycloneDX)
+            </button>
+            @if (_showSbom)
+            {
+                @if (_sbomError is not null)
+                {
+                    <div class="alert alert-error" role="alert">@_sbomError</div>
+                }
+                else
+                {
+                    <pre class="sbom-output">@_sbomText</pre>
+                }
+            }
+        }
+    </section>
+}

@@ -1,0 +1,44 @@
+# Pinned clang toolchain image for the reproducible corpus build matrix
+# (contracts/corpus-builder.md, contracts/signature-db.md manifest.json "toolchains").
+#
+# Build one image per target architecture by passing --build-arg TARGET_ARCH:
+#   docker build -f Dockerfile.clang --build-arg TARGET_ARCH=x86_64  -t strata-corpus-clang-x86_64  .
+#   docker build -f Dockerfile.clang --build-arg TARGET_ARCH=aarch64 -t strata-corpus-clang-aarch64 .
+#
+# Pinned by digest (not a floating tag) so a rebuild months later reproduces the same base layer —
+# part of the SC-009 reproducibility invariant. Replace the digest when deliberately bumping clang,
+# and record the new digest in the corpus manifest's `toolchains[].imageDigest`.
+FROM debian:bookworm-20240701-slim@sha256:2bc5c236e9b262645a323e9088dfa3bb1ecb16cc75811daf40a23a824a1d5a6
+
+ARG TARGET_ARCH=x86_64
+ENV DEBIAN_FRONTEND=noninteractive
+
+# clang 17.0.6, pinned by explicit package version rather than "clang" (whatever bookworm currently
+# resolves to), plus the aarch64 cross-linker/sysroot pieces clang needs for cross-compiling.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        clang-17=1:17.0.6-9~deb12u1 \
+        lld-17=1:17.0.6-9~deb12u1 \
+        make=4.3-4.1 \
+        binutils=2.40-2 \
+        binutils-aarch64-linux-gnu=2.40-2 \
+        libc6-dev-arm64-cross \
+        ca-certificates=20230311 \
+        curl=7.88.1-10+deb12u8 \
+        xz-utils=5.4.1-0.2 \
+        && \
+    rm -rf /var/lib/apt/lists/* && \
+    ln -sf /usr/bin/clang-17 /usr/bin/clang && \
+    ln -sf /usr/bin/clang++-17 /usr/bin/clang++
+
+WORKDIR /build
+
+# The build matrix driver (external to this Dockerfile, run by CI) mounts one recipe's fetched
+# source tree at /build/src and drives:
+#   for opt in -O0 -O2 -O3 -Os; do
+#     CC="clang" CFLAGS="$opt $( [ "$TARGET_ARCH" = aarch64 ] && echo --target=aarch64-linux-gnu )" \
+#     ./configure && make -j"$(nproc)"
+#   done
+# Output binaries are collected per (recipe, version, compiler, opt, arch) and handed to
+# `Strata.CorpusBuilder build --binaries <dir>` for fingerprinting.
+ENTRYPOINT ["/bin/sh"]

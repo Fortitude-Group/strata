@@ -1,0 +1,14 @@
+{
+  "name": "libpng",
+  "purl": "pkg:generic/libpng",
+  "knownLicense": "Libpng",
+  "sourceUrl": "https://github.com/pnggroup/libpng",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [
+    { "version": "1.6.36", "cveFlagged": true },
+    { "version": "1.6.37", "cveFlagged": false },
+    { "version": "1.6.40", "cveFlagged": false },
+    { "version": "1.6.43", "cveFlagged": false }
+  ],
+  "buildFlags": ["-O0", "-O2", "-O3", "-Os"]
+}

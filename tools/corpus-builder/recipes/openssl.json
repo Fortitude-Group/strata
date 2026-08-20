@@ -1,0 +1,14 @@
+{
+  "name": "openssl",
+  "purl": "pkg:generic/openssl",
+  "knownLicense": "Apache-2.0",
+  "sourceUrl": "https://github.com/openssl/openssl",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [
+    { "version": "1.1.1m", "cveFlagged": true },
+    { "version": "1.1.1w", "cveFlagged": false },
+    { "version": "3.0.6", "cveFlagged": true },
+    { "version": "3.0.13", "cveFlagged": false }
+  ],
+  "buildFlags": ["-O0", "-O2", "-O3", "-Os"]
+}

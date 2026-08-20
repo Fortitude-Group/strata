@@ -1,0 +1,25 @@
+# Strata public web demo (contracts/web-demo.md — User Story 6).
+#
+# Run from the repo root (the build context has to see the sibling Strata.Core/Corpus/Sbom
+# projects that Strata.Web references):
+#   docker compose -f src/Strata.Web/docker-compose.yml up --build
+# then open http://localhost:8080.
+#
+# Config parameters (contracts/web-demo.md "Config parameters"): MaxUploadBytes and
+# ThrottlePerIp/ThrottleWindowSeconds are set here at deploy time. Retention is NOT configurable —
+# it is always "none / in-memory" in the app itself.
+services:
+  strata-web:
+    build:
+      context: ../../
+      dockerfile: src/Strata.Web/Dockerfile
+    image: strata-web:local
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      Demo__MaxUploadBytes: "8388608"
+      Demo__ThrottlePerIp: "10"
+      Demo__ThrottleWindowSeconds: "60"
+    restart: unless-stopped

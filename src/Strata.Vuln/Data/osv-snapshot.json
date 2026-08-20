@@ -1,0 +1,70 @@
+{
+  "snapshotVersion": "osv-2026-08-20",
+  "vulnerabilities": [
+    {
+      "id": "CVE-2018-25032",
+      "source": "Osv",
+      "severity": "HIGH",
+      "affected": [
+        {
+          "library": "zlib",
+          "ranges": [
+            { "introduced": "1.2.0", "fixed": "1.2.12" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CVE-2022-37434",
+      "source": "Osv",
+      "severity": "CRITICAL",
+      "affected": [
+        {
+          "library": "zlib",
+          "ranges": [
+            { "introduced": "0", "fixed": "1.2.13" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CVE-2021-3712",
+      "source": "Osv",
+      "severity": "MODERATE",
+      "affected": [
+        {
+          "library": "openssl",
+          "ranges": [
+            { "introduced": "1.1.1", "fixed": "1.1.1l" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CVE-2019-7317",
+      "source": "Nvd",
+      "severity": "MEDIUM",
+      "affected": [
+        {
+          "library": "libpng",
+          "ranges": [
+            { "introduced": "1.6.0", "fixed": "1.6.38" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CVE-2020-13435",
+      "source": "Osv",
+      "severity": "MEDIUM",
+      "affected": [
+        {
+          "library": "sqlite",
+          "ranges": [
+            { "introduced": "3.0.0", "fixed": "3.32.0" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,172 @@
+name: "Strata SBOM Scan"
+description: >-
+  Evidence-backed SBOM generation from native binaries, via the runtime-free `strata` container
+  image (contracts/github-action.md, User Story 4 / FR-021). No .NET or Python install required
+  on the runner — the scan itself runs entirely inside the container.
+author: "Fortitude Omnis Group"
+
+branding:
+  icon: "shield"
+  color: "blue"
+
+inputs:
+  binary:
+    description: >-
+      Path (relative to the workspace) to the binary to scan. Required.
+    required: true
+  format:
+    description: "SBOM output format: cyclonedx | spdx | both."
+    required: false
+    default: "cyclonedx"
+  corpus:
+    description: >-
+      Path (relative to the workspace) to a corpus database. When omitted, the bundled/pinned
+      seed corpus embedded in the image is used.
+    required: false
+    default: ""
+  fail-on:
+    description: >-
+      Policy mapping the underlying `strata` exit code to job pass/fail (contracts/cli.md exit
+      codes). One of: error | findings | never.
+        - error    (default) fail the job only on a hard CLI error (exit 1) or usage error
+                    (exit 3). Findings needing attention (exit 2 — e.g. known CVEs, packing
+                    detected) are reported but do NOT fail the job.
+        - findings fail the job on exit 1, exit 3, *and* exit 2 (findings needing attention) —
+                    the strict/gating policy.
+        - never    always pass the job regardless of the underlying exit code (informational-only
+                    runs).
+    required: false
+    default: "error"
+  output:
+    description: >-
+      Path (relative to the workspace) to write the generated SBOM artefact(s) to. When
+      `format: both`, the CycloneDX and SPDX documents are written as `<output>.cdx.json` and
+      `<output>.spdx.json` respectively (see `sbom-path` output).
+    required: false
+    default: "strata.sbom"
+  image:
+    description: >-
+      Optional pinned `strata` container image reference (e.g. `ghcr.io/fortitude-group/strata:0.1.0`,
+      Principle II — image tag pins tool + corpus version). When omitted, the image is built
+      locally from the Dockerfile bundled with this action (`src/Strata.Cli/Dockerfile`).
+    required: false
+    default: ""
+
+outputs:
+  sbom-path:
+    description: >-
+      Path to the generated SBOM (relative to the workspace). Comma-separated when
+      `format: both`.
+    value: ${{ steps.scan.outputs.sbom-path }}
+  component-count:
+    description: "Number of components identified."
+    value: ${{ steps.scan.outputs.component-count }}
+  cve-count:
+    description: "Number of known CVEs across identified components."
+    value: ${{ steps.scan.outputs.cve-count }}
+  exit-code:
+    description: "The underlying `strata` exit code (see contracts/cli.md)."
+    value: ${{ steps.scan.outputs.exit-code }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Resolve strata image
+      id: image
+      shell: bash
+      run: |
+        set -euo pipefail
+        if [ -n "${{ inputs.image }}" ]; then
+          echo "image=${{ inputs.image }}" >> "$GITHUB_OUTPUT"
+        else
+          IMAGE_TAG="strata-action:local"
+          docker build \
+            -f "${{ github.action_path }}/src/Strata.Cli/Dockerfile" \
+            -t "$IMAGE_TAG" \
+            "${{ github.action_path }}"
+          echo "image=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Run strata scan (container image — no runtime install on the runner, FR-021)
+      id: scan
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        CORPUS_FLAG=()
+        if [ -n "${{ inputs.corpus }}" ]; then
+          CORPUS_FLAG=(--corpus "/workspace/${{ inputs.corpus }}")
+        fi
+
+        STDOUT_LOG="$(mktemp)"
+
+        # Run non-interactively; capture the exit code without tripping `set -e` (the exit code
+        # is a first-class result here, not a script failure — contracts/cli.md).
+        set +e
+        docker run --rm \
+          -v "${{ github.workspace }}:/workspace" \
+          -w /workspace \
+          "${{ steps.image.outputs.image }}" \
+          scan "/workspace/${{ inputs.binary }}" \
+          --format "${{ inputs.format }}" \
+          --output "${{ inputs.output }}" \
+          --report json \
+          "${CORPUS_FLAG[@]}" \
+          > "$STDOUT_LOG" 2>&1
+        EXIT_CODE=$?
+        set -e
+
+        cat "$STDOUT_LOG"
+
+        # stdout is: zero or more "wrote <fmt> SBOM -> <path>" lines, then the pretty-printed
+        # JSON report (Strata.Sbom.Reports.JsonReport) — its first line is exactly "{". Slice
+        # from there so jq only sees the JSON document.
+        REPORT_JSON="$(mktemp)"
+        awk '/^\{/{f=1} f' "$STDOUT_LOG" > "$REPORT_JSON"
+
+        if [ -s "$REPORT_JSON" ]; then
+          COMPONENT_COUNT="$(jq '.Components | length' "$REPORT_JSON")"
+          CVE_COUNT="$(jq '[.Components[]?.Vulnerabilities[]?] | length' "$REPORT_JSON")"
+        else
+          COMPONENT_COUNT="0"
+          CVE_COUNT="0"
+        fi
+
+        if [ "${{ inputs.format }}" = "both" ]; then
+          SBOM_PATH="${{ inputs.output }}.cdx.json,${{ inputs.output }}.spdx.json"
+        else
+          SBOM_PATH="${{ inputs.output }}"
+        fi
+
+        {
+          echo "sbom-path=$SBOM_PATH"
+          echo "component-count=$COMPONENT_COUNT"
+          echo "cve-count=$CVE_COUNT"
+          echo "exit-code=$EXIT_CODE"
+        } >> "$GITHUB_OUTPUT"
+
+        echo "strata exit code: $EXIT_CODE (fail-on: ${{ inputs.fail-on }})"
+
+        # Map the CLI exit code to job pass/fail per the `fail-on` policy.
+        case "${{ inputs.fail-on }}" in
+          never)
+            exit 0
+            ;;
+          findings)
+            if [ "$EXIT_CODE" -ne 0 ]; then
+              echo "::error::strata exited $EXIT_CODE; failing per fail-on: findings"
+              exit "$EXIT_CODE"
+            fi
+            ;;
+          error|*)
+            if [ "$EXIT_CODE" -eq 1 ] || [ "$EXIT_CODE" -eq 3 ]; then
+              echo "::error::strata exited $EXIT_CODE (hard error/usage); failing per fail-on: error"
+              exit "$EXIT_CODE"
+            fi
+            if [ "$EXIT_CODE" -eq 2 ]; then
+              echo "::warning::strata reported findings needing attention (exit 2) — not failing per fail-on: error"
+            fi
+            ;;
+        esac
+
+        exit 0

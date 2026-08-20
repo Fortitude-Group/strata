@@ -1,0 +1,14 @@
+{
+  "name": "sqlite",
+  "purl": "pkg:generic/sqlite",
+  "knownLicense": "blessing",
+  "sourceUrl": "https://sqlite.org/src",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [
+    { "version": "3.38.5", "cveFlagged": true },
+    { "version": "3.39.4", "cveFlagged": false },
+    { "version": "3.42.0", "cveFlagged": false },
+    { "version": "3.46.0", "cveFlagged": false }
+  ],
+  "buildFlags": ["-O0", "-O2", "-O3", "-Os"]
+}
