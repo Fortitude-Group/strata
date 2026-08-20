@@ -1,0 +1,9 @@
+{
+  "name": "fastlz",
+  "purl": "pkg:generic/fastlz",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/ariya/FastLZ",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "0.5.0", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

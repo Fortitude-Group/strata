@@ -1,0 +1,9 @@
+{
+  "name": "zopfli",
+  "purl": "pkg:generic/zopfli",
+  "knownLicense": "Apache-2.0",
+  "sourceUrl": "https://github.com/google/zopfli",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.0.3", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

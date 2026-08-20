@@ -1,0 +1,9 @@
+{
+  "name": "yyjson",
+  "purl": "pkg:generic/yyjson",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/ibireme/yyjson",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "0.10.0", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

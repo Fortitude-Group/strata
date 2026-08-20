@@ -1,0 +1,9 @@
+{
+  "name": "monocypher",
+  "purl": "pkg:generic/monocypher",
+  "knownLicense": "CC0-1.0",
+  "sourceUrl": "https://github.com/LoupVaillant/Monocypher",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "4.0.2", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "lua",
+  "purl": "pkg:generic/lua",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/lua/lua",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "5.4.6", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

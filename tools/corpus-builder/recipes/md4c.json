@@ -1,0 +1,9 @@
+{
+  "name": "md4c",
+  "purl": "pkg:generic/md4c",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/mity/md4c",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "0.5.2", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

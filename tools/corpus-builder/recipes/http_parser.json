@@ -1,0 +1,9 @@
+{
+  "name": "http_parser",
+  "purl": "pkg:generic/http_parser",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/nodejs/http-parser",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "2.9.4", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}
