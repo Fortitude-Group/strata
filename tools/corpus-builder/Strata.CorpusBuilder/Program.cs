@@ -18,6 +18,9 @@ switch (verb)
     case "build":
         return RunBuild(parsed);
 
+    case "train-export":
+        return RunTrainExport(parsed);
+
     case "verify":
         return RunVerify(parsed);
 
@@ -45,10 +48,11 @@ int RunBuild(ArgMap a)
     }
 
     string corpusVersion = a.Get("corpus-version") ?? "1.0.0";
+    string? modelPath = a.Get("model");
 
     try
     {
-        BuildOrchestrator.BuildSummary summary = BuildOrchestrator.Build(recipes, binaries, outDir, corpusVersion);
+        BuildOrchestrator.BuildSummary summary = BuildOrchestrator.Build(recipes, binaries, outDir, corpusVersion, modelPath);
 
         Console.Out.WriteLine($"binaries processed : {summary.BinariesProcessed}");
         Console.Out.WriteLine($"libraries          : {summary.LibraryCount}");
@@ -69,6 +73,29 @@ int RunBuild(ArgMap a)
     }
     catch (Exception ex) when (ex is System.IO.IOException or InvalidOperationException
         or System.IO.DirectoryNotFoundException or ArgumentException)
+    {
+        Console.Error.WriteLine($"error: {ex.Message}");
+        return ExitError;
+    }
+}
+
+int RunTrainExport(ArgMap a)
+{
+    string? binaries = a.Get("binaries");
+    string? outPath = a.Get("out");
+    if (binaries is null || outPath is null)
+    {
+        Console.Error.WriteLine("error: 'train-export' requires --binaries <dir> --out <features.json>");
+        return ExitUsage;
+    }
+
+    try
+    {
+        int count = TrainExport.Export(binaries, outPath);
+        Console.Out.WriteLine($"exported {count} labelled training examples to {outPath}");
+        return count == 0 ? ExitError : ExitSuccess;
+    }
+    catch (Exception ex) when (ex is System.IO.IOException or System.IO.DirectoryNotFoundException or ArgumentException)
     {
         Console.Error.WriteLine($"error: {ex.Message}");
         return ExitError;

@@ -54,7 +54,8 @@ public static class BuildOrchestrator
         int LibraryCount,
         bool ManifestFound);
 
-    public static BuildSummary Build(string recipesDir, string binariesDir, string outDir, string corpusVersion)
+    public static BuildSummary Build(
+        string recipesDir, string binariesDir, string outDir, string corpusVersion, string? modelPath = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(recipesDir);
         ArgumentException.ThrowIfNullOrEmpty(binariesDir);
@@ -68,6 +69,9 @@ public static class BuildOrchestrator
         }
 
         Directory.CreateDirectory(outDir);
+
+        using Strata.Core.Fingerprinting.EmbeddingModel? model =
+            Strata.Core.Fingerprinting.EmbeddingModel.TryLoad(modelPath);
 
         var warnings = new List<string>();
         var allStrings = new List<CorpusStringSignature>();
@@ -101,7 +105,7 @@ public static class BuildOrchestrator
             }
 
             SignatureExtractor.Extracted extracted = SignatureExtractor.Extract(
-                target, recipe.Name, recipe.Purl, recipe.KnownLicense, version.Version);
+                target, recipe.Name, recipe.Purl, recipe.KnownLicense, version.Version, model);
 
             allStrings.AddRange(extracted.Strings);
             allFunctions.AddRange(extracted.Functions);

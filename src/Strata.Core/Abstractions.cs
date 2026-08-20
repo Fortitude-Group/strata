@@ -36,6 +36,9 @@ public sealed record ScanOptions
     public RecoveryOptions Recovery { get; init; } = new();
 
     public MatchOptions Match { get; init; } = new();
+
+    /// <summary>Optional path to a learned-embedding ONNX model (research.md R7); null = heuristics only.</summary>
+    public string? ModelPath { get; init; }
 }
 
 /// <summary>Ingestion: parse a native binary into a <see cref="ScanTarget"/> (FR-001..005).</summary>

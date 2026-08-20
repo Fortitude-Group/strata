@@ -37,7 +37,7 @@ public sealed class FunctionRecovery : IFunctionRecovery
                 continue;
             }
 
-            List<ulong> entries = EntryPoints(instrs, section);
+            List<ulong> entries = EntryPoints(instrs, section, target.Symbols);
             for (int e = 0; e < entries.Count; e++)
             {
                 ulong start = entries[e];
@@ -73,11 +73,23 @@ public sealed class FunctionRecovery : IFunctionRecovery
         return named.Count > 0 ? named : target.Sections.Where(s => s.Size > 0);
     }
 
-    private static List<ulong> EntryPoints(IReadOnlyList<DecodedInstruction> instrs, Section section)
+    private static List<ulong> EntryPoints(
+        IReadOnlyList<DecodedInstruction> instrs, Section section, IReadOnlyList<Symbol> symbols)
     {
         var entries = new SortedSet<ulong> { section.VirtualAddress };
         ulong lo = section.VirtualAddress;
         ulong hi = section.VirtualAddress + section.Size;
+
+        // Function symbols (when the binary is not stripped) give exact, high-confidence boundaries.
+        foreach (Symbol s in symbols)
+        {
+            if (s.Address >= lo && s.Address < hi)
+            {
+                entries.Add(s.Address);
+            }
+        }
+
+        // Call targets recover boundaries that symbols don't cover (the stripped fast path).
         foreach (DecodedInstruction i in instrs)
         {
             if (i.Flow == FlowKind.Call && i.BranchTarget >= lo && i.BranchTarget < hi)

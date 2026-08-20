@@ -43,7 +43,7 @@ if (checkpoint is not ("A" or "a" or "B" or "b"))
 
 try
 {
-    BenchmarkReport report = BenchmarkRunner.Run(corpusPath, binariesDir, groundTruthPath, checkpoint);
+    BenchmarkReport report = BenchmarkRunner.Run(corpusPath, binariesDir, groundTruthPath, checkpoint, parsed.Get("model"));
 
     Console.Out.WriteLine($"corpus version              : {report.CorpusVersion}");
     Console.Out.WriteLine($"binaries evaluated           : {report.BinaryCount}");

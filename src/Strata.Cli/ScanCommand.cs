@@ -33,6 +33,7 @@ public static class ScanCommand
             var options = new ScanOptions
             {
                 Match = new MatchOptions { MinConfidence = args.GetDouble("min-confidence", 0.5) },
+                ModelPath = args.Get("model"),
             };
 
             var scanner = new StrataScanner();

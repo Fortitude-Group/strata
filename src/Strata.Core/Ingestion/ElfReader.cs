@@ -100,6 +100,90 @@ public static class ElfReader
         return sections;
     }
 
+    /// <summary>
+    /// Best-effort function-symbol parse (STT_FUNC) from `.symtab`/`.strtab` (or `.dynsym`/`.dynstr`).
+    /// Returns an empty list for stripped binaries — which is the common case, so callers must not
+    /// depend on symbols being present.
+    /// </summary>
+    public static IReadOnlyList<Symbol> ReadFunctionSymbols(
+        ReadOnlySpan<byte> data, ElfHeader header, IReadOnlyList<Section> sections)
+    {
+        var symbols = new List<Symbol>();
+        if (!header.Is64)
+        {
+            return symbols;
+        }
+
+        (string symName, string strName)[] pairs = [(".symtab", ".strtab"), (".dynsym", ".dynstr")];
+        try
+        {
+            bool le = header.IsLittleEndian;
+            foreach ((string symName, string strName) in pairs)
+            {
+                Section? symtab = FindSection(sections, symName);
+                Section? strtab = FindSection(sections, strName);
+                if (symtab is null || strtab is null || symtab.Size == 0)
+                {
+                    continue;
+                }
+
+                const int entSize = 24; // sizeof(Elf64_Sym)
+                ulong count = symtab.Size / entSize;
+                for (ulong i = 0; i < count; i++)
+                {
+                    int baseOff = (int)(symtab.Offset + (i * entSize));
+                    if (baseOff + entSize > data.Length)
+                    {
+                        break;
+                    }
+
+                    byte info = data[baseOff + 4];
+                    if ((info & 0xF) != 2)
+                    {
+                        continue; // not STT_FUNC
+                    }
+
+                    uint nameIdx = ReadU32(data.Slice(baseOff, 4), le);
+                    ulong value = ReadU64(data.Slice(baseOff + 8, 8), le);
+                    if (value == 0)
+                    {
+                        continue; // undefined/import
+                    }
+
+                    string name = ReadCString(data, (int)(strtab.Offset + nameIdx), (int)strtab.Size);
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        symbols.Add(new Symbol(name, value, IsImport: false));
+                    }
+                }
+
+                if (symbols.Count > 0)
+                {
+                    break; // prefer .symtab; only fall back to .dynsym when .symtab yielded nothing
+                }
+            }
+        }
+        catch (System.Exception)
+        {
+            return symbols;
+        }
+
+        return symbols;
+    }
+
+    private static Section? FindSection(IReadOnlyList<Section> sections, string name)
+    {
+        foreach (Section s in sections)
+        {
+            if (s.Name == name)
+            {
+                return s;
+            }
+        }
+
+        return null;
+    }
+
     private static string ReadCString(ReadOnlySpan<byte> data, int start, int maxLen)
     {
         if (start < 0 || start >= data.Length)

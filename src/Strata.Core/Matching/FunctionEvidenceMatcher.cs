@@ -35,12 +35,23 @@ public sealed class FunctionEvidenceMatcher
 
         var index = new LshIndex(corpus.FunctionSignatures);
 
+        // Corpus functions carrying an embedding — brute-forced when the target has one (research.md R7),
+        // so the learned signal can surface matches the MinHash-LSH candidates miss (the Checkpoint-B case).
+        var embeddedCorpus = new List<int>();
+        for (int i = 0; i < corpus.FunctionSignatures.Count; i++)
+        {
+            if (corpus.FunctionSignatures[i].Embedding is { Count: > 0 })
+            {
+                embeddedCorpus.Add(i);
+            }
+        }
+
         // library -> (matched corpus fns, matched target ids, weighted matches, evidence)
         var perLibrary = new Dictionary<string, LibraryAccumulator>(StringComparer.Ordinal);
 
         foreach (TargetFunction tf in targetFunctions)
         {
-            (CorpusFunctionSignature corpusFn, double sim)? best = BestMatch(tf.Signature, index);
+            (CorpusFunctionSignature corpusFn, double sim)? best = BestMatch(tf.Signature, index, corpus, embeddedCorpus);
             if (best is null)
             {
                 continue;
@@ -80,20 +91,28 @@ public sealed class FunctionEvidenceMatcher
         return result.OrderByDescending(r => r.Coverage).ThenBy(r => r.LibraryName, StringComparer.Ordinal).ToList();
     }
 
-    private (CorpusFunctionSignature, double)? BestMatch(FunctionSignature target, LshIndex index)
+    private (CorpusFunctionSignature, double)? BestMatch(
+        FunctionSignature target, LshIndex index, ICorpus corpus, IReadOnlyList<int> embeddedCorpus)
     {
         CorpusFunctionSignature? best = null;
         double bestSim = 0.0;
 
-        foreach (int candidateIdx in index.Candidates(target))
+        void Consider(CorpusFunctionSignature candidate)
         {
-            CorpusFunctionSignature candidate = index[candidateIdx];
             double sim = MinHash.Similarity(target.NormInsnMinHash, candidate.NormInsnMinHash);
 
             // Exact CFG-shape agreement is corroborating evidence on top of instruction similarity.
             if (candidate.CfgShapeHash == target.CfgShapeHash)
             {
                 sim = Math.Max(sim, 0.75);
+            }
+
+            // Learned-embedding channel: cosine of the two embeddings can surface a match the discrete
+            // signals miss across compilers/opt levels (the Checkpoint-B case).
+            if (target.Embedding is { Count: > 0 } te && candidate.Embedding is { Count: > 0 } ce
+                && te.Count == ce.Count)
+            {
+                sim = Math.Max(sim, Cosine(te, ce));
             }
 
             if (sim > bestSim)
@@ -103,7 +122,34 @@ public sealed class FunctionEvidenceMatcher
             }
         }
 
+        foreach (int candidateIdx in index.Candidates(target))
+        {
+            Consider(index[candidateIdx]);
+        }
+
+        // When the target has an embedding, also weigh the embedded corpus functions directly.
+        if (target.Embedding is { Count: > 0 })
+        {
+            foreach (int idx in embeddedCorpus)
+            {
+                Consider(corpus.FunctionSignatures[idx]);
+            }
+        }
+
         return best is not null && bestSim >= _similarityThreshold ? (best, bestSim) : null;
+    }
+
+    private static double Cosine(IReadOnlyList<float> a, IReadOnlyList<float> b)
+    {
+        double dot = 0, na = 0, nb = 0;
+        for (int i = 0; i < a.Count; i++)
+        {
+            dot += a[i] * b[i];
+            na += a[i] * a[i];
+            nb += b[i] * b[i];
+        }
+
+        return na > 0 && nb > 0 ? dot / (Math.Sqrt(na) * Math.Sqrt(nb)) : 0.0;
     }
 
     private sealed class LibraryAccumulator

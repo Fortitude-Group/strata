@@ -37,6 +37,7 @@ public static class CorpusSchema
             function_name  TEXT NOT NULL,
             cfg_shape_hash TEXT NOT NULL,
             norm_insn_minhash TEXT NOT NULL,
+            embedding      TEXT,
             distinctiveness REAL NOT NULL,
             exact_version  TEXT,
             version_low    TEXT,

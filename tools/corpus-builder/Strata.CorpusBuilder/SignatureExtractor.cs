@@ -25,10 +25,18 @@ public static class SignatureExtractor
         Architecture Architecture);
 
     public static Extracted Extract(
-        ScanTarget target, string libraryName, string? purl, string? knownLicense, string? version)
+        ScanTarget target, string libraryName, string? purl, string? knownLicense, string? version,
+        EmbeddingModel? model = null)
     {
         ArgumentNullException.ThrowIfNull(target);
         ArgumentException.ThrowIfNullOrEmpty(libraryName);
+
+        Fingerprinter fingerprinter = model is not null ? new Fingerprinter(model) : Fingerprinter;
+        var symbolByAddress = new Dictionary<ulong, string>();
+        foreach (Symbol s in target.Symbols)
+        {
+            symbolByAddress.TryAdd(s.Address, s.Name);
+        }
 
         List<CorpusStringSignature> stringSigs = target.Strings
             .Select(s => s.Value)
@@ -49,13 +57,17 @@ public static class SignatureExtractor
         var functionSigs = new List<CorpusFunctionSignature>(functions.Count);
         foreach (RecoveredFunction fn in functions.OrderBy(f => f.StartAddress))
         {
-            FunctionSignature sig = Fingerprinter.Fingerprint(fn, target);
+            FunctionSignature sig = fingerprinter.Fingerprint(fn, target);
+            string name = symbolByAddress.TryGetValue(fn.StartAddress, out string? sym)
+                ? sym
+                : $"{libraryName}+0x{fn.StartAddress:x}";
             functionSigs.Add(new CorpusFunctionSignature
             {
                 LibraryName = libraryName,
-                FunctionName = $"{libraryName}+0x{fn.StartAddress:x}",
+                FunctionName = name,
                 CfgShapeHash = sig.CfgShapeHash,
                 NormInsnMinHash = sig.NormInsnMinHash,
+                Embedding = sig.Embedding,
                 Distinctiveness = 1.0,
                 ExactVersion = version,
             });

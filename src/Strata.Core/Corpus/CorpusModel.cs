@@ -54,6 +54,9 @@ public sealed record CorpusFunctionSignature
 
     public required IReadOnlyList<uint> NormInsnMinHash { get; init; }
 
+    /// <summary>Optional learned embedding (research.md R7); null when the model is parked (SC-004).</summary>
+    public IReadOnlyList<float>? Embedding { get; init; }
+
     /// <summary>0..1; down-weights functions whose signatures also appear in other libraries (R9).</summary>
     public double Distinctiveness { get; init; } = 1.0;
 

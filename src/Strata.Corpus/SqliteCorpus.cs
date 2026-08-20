@@ -62,7 +62,7 @@ public static class SqliteCorpus
         {
             cmd.CommandText = """
                 SELECT l.name, f.function_name, f.cfg_shape_hash, f.norm_insn_minhash, f.distinctiveness,
-                       f.exact_version, f.version_low, f.version_high
+                       f.exact_version, f.version_low, f.version_high, f.embedding
                 FROM function_signature f
                 JOIN library l ON l.id = f.library_id
                 ORDER BY l.name, f.function_name;
@@ -80,6 +80,7 @@ public static class SqliteCorpus
                     ExactVersion = r.IsDBNull(5) ? null : r.GetString(5),
                     VersionLow = r.IsDBNull(6) ? null : r.GetString(6),
                     VersionHigh = r.IsDBNull(7) ? null : r.GetString(7),
+                    Embedding = r.IsDBNull(8) ? null : ParseFloats(r.GetString(8)),
                 });
             }
         }
@@ -124,6 +125,23 @@ public static class SqliteCorpus
         for (int i = 0; i < parts.Length; i++)
         {
             values[i] = uint.Parse(parts[i], CultureInfo.InvariantCulture);
+        }
+
+        return values;
+    }
+
+    private static float[] ParseFloats(string csv)
+    {
+        if (string.IsNullOrEmpty(csv))
+        {
+            return [];
+        }
+
+        string[] parts = csv.Split(',', StringSplitOptions.RemoveEmptyEntries);
+        var values = new float[parts.Length];
+        for (int i = 0; i < parts.Length; i++)
+        {
+            values[i] = float.Parse(parts[i], CultureInfo.InvariantCulture);
         }
 
         return values;

@@ -21,7 +21,8 @@ public static class BenchmarkRunner
         WriteIndented = true,
     };
 
-    public static BenchmarkReport Run(string corpusPath, string binariesDir, string groundTruthPath, string checkpoint)
+    public static BenchmarkReport Run(
+        string corpusPath, string binariesDir, string groundTruthPath, string checkpoint, string? modelPath = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(corpusPath);
         ArgumentException.ThrowIfNullOrEmpty(binariesDir);
@@ -31,6 +32,7 @@ public static class BenchmarkRunner
         Dictionary<string, List<GroundTruthComponent>> groundTruth = LoadGroundTruth(groundTruthPath);
 
         var scanner = new StrataScanner();
+        var scanOptions = new ScanOptions { ModelPath = modelPath };
         var perBinary = new List<BinaryResult>();
         var perLibraryAgg = new Dictionary<string, (int Tp, int Fp, int Fn)>(StringComparer.OrdinalIgnoreCase);
 
@@ -72,7 +74,7 @@ public static class BenchmarkRunner
             ScanResult result;
             using (FileStream fs = File.OpenRead(path))
             {
-                result = scanner.Scan(fs, fileName, corpus, new ScanOptions());
+                result = scanner.Scan(fs, fileName, corpus, scanOptions);
             }
 
             stopwatch.Stop();

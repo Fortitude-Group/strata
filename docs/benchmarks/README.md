@@ -32,6 +32,24 @@ the exact version every time — clearing Checkpoint A on real cross-compiler bi
 - This is a **single-library** corpus (zlib). The precision figure does not yet stress cross-library
   false positives at scale; that needs the full ~50-library corpus (in progress).
 
+## Checkpoint B — SC-004 embedding decision: **PARKED** (2026-08-20)
+
+The full learned-embedding pipeline was built and run end-to-end on the real zlib corpus: symbol-labelled
+training export (1593 examples, 149 functions) → contrastive projection trained in Python (numpy) →
+ONNX export → ONNX Runtime inference in `Strata.Core` → embedding channel in the function matcher →
+corpus rebuilt with embeddings (1605 function signatures).
+
+**Measured result.** On the hardest cross-optimisation case (`-O0` clang target vs `-O2/-O3/-Os` gcc
+corpus), the embedding added **0** additional function matches over heuristics — the crude
+opcode-histogram projection cannot bridge the O0↔O2 instruction-mix gap, and library-level recall was
+already saturated at 100% by the string signal on this string-rich library.
+
+**Decision (SC-004).** The embedding does **not** clear the ≥5-point recall-gain bar, so it is
+**parked**: Strata ships heuristics-first. The inference wiring, corpus embedding storage, trainer, and
+`--model` flag remain in place so a stronger model (deeper architecture, larger multi-library corpus,
+symbol-consistent recovery on both sides) can be dropped in and re-measured without code changes. This
+is the spec's designed outcome, now backed by a real number rather than an assumption.
+
 ## Reproducing
 
 ```bash

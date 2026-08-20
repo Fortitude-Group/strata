@@ -57,11 +57,15 @@ public sealed class StrataScanner : IScanner
         progress?.Report(new ScanProgress("recover", "Recovering functions", 0.35));
         IReadOnlyList<RecoveredFunction> functions = _recovery.Recover(target, options.Recovery);
 
+        // A learned-embedding model (if supplied) augments the heuristic fingerprints for this scan.
+        using Fingerprinting.EmbeddingModel? model = Fingerprinting.EmbeddingModel.TryLoad(options.ModelPath);
+        IFingerprinter fingerprinter = model is not null ? new Fingerprinting.Fingerprinter(model) : _fingerprinter;
+
         progress?.Report(new ScanProgress("fingerprint", $"Fingerprinting {functions.Count} functions", 0.55));
         var targetFunctions = new List<TargetFunction>(functions.Count);
         foreach (RecoveredFunction fn in functions)
         {
-            targetFunctions.Add(new TargetFunction(fn, _fingerprinter.Fingerprint(fn, target)));
+            targetFunctions.Add(new TargetFunction(fn, fingerprinter.Fingerprint(fn, target)));
         }
 
         progress?.Report(new ScanProgress("match", "Matching against corpus", 0.8));

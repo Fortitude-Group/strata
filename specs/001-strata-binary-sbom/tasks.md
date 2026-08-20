@@ -70,9 +70,9 @@ Multi-project .NET solution (`Strata.slnx`) per plan.md: engine `src/Strata.Core
 - [X] T002 Create `Strata.slnx` and all project skeletons targeting `net10.0`: `src/Strata.{Core,Corpus,Sbom,Vuln,Cli,Web}`, `tools/corpus-builder/Strata.CorpusBuilder`, `benchmark/Strata.Benchmark`, and `tests/*` projects
 - [X] T003 [P] Add `Directory.Build.props` (net10.0, `Deterministic=true`, `ContinuousIntegrationBuild`, `Nullable=enable`, warnings-as-errors) at repo root
 - [X] T004 [P] Add `.editorconfig` + `dotnet format`/analyzer config at repo root
-- [ ] T005 [P] Pin engine deps in `src/Strata.Core/Strata.Core.csproj`: Iced, Gee.External.Capstone, Microsoft.Data.Sqlite, Microsoft.ML.OnnxRuntime
+- [X] T005 [P] Pin engine deps in `src/Strata.Core/Strata.Core.csproj`: Iced, Gee.External.Capstone, Microsoft.Data.Sqlite, Microsoft.ML.OnnxRuntime
 - [X] T006 [P] Pin SBOM deps in `src/Strata.Sbom/Strata.Sbom.csproj`: CycloneDX
-- [ ] T007 [P] Pin CLI deps in `src/Strata.Cli/Strata.Cli.csproj`: System.CommandLine, Spectre.Console
+- [X] T007 [P] Pin CLI deps in `src/Strata.Cli/Strata.Cli.csproj`: System.CommandLine, Spectre.Console
 - [X] T008 [P] Pin test deps across `tests/*`: xUnit, FluentAssertions, CycloneDX/SPDX schema validators
 - [X] T009 [P] Add CI workflow `.github/workflows/ci.yml` (restore → build → test → format) as `fortitude-omnis`
 - [X] T010 [P] Scaffold `tools/ml-training/` (Python 3.12 `pyproject.toml`, torch, onnx) — off ship path
@@ -190,9 +190,9 @@ signal, gated by SC-004.
 - [X] T066 [US3] Benchmark runner: per-library + aggregate precision/recall/version-accuracy + scan wall-time in `benchmark/Strata.Benchmark/BenchmarkRunner.cs`; **record host CPU/RAM and gate wall-time against the SC-005 reference machine (8-core x86-64 / 16 GB / SSD)** (depends T044, T065)
 - [X] T067 [US3] Checkpoint A/B evaluation + publishable report (pass/fail regardless) in `benchmark/Strata.Benchmark/CheckpointEvaluator.cs` (depends T066)
 - [X] T068 [US3] `strata benchmark` CLI command in `src/Strata.Cli/Commands/BenchmarkCommand.cs` (depends T067)
-- [ ] T069 [P] [US3] Contrastive/Siamese similarity model training (PyTorch) on corpus function pairs + ONNX export in `tools/ml-training/` (depends T063)
-- [ ] T070 [US3] ONNX Runtime embedding signal in `src/Strata.Core/Fingerprinting/EmbeddingSignal.cs` + HNSW index in `src/Strata.Corpus/Index/HnswIndex.cs` (depends T069, T040)
-- [ ] T071 [US3] SC-004 ship/park decision: measure embedding recall delta on benchmark, wire into `Fingerprinter` or park with recorded rationale (depends T070, T067)
+- [X] T069 [P] [US3] Contrastive/Siamese similarity model training (PyTorch) on corpus function pairs + ONNX export in `tools/ml-training/` (depends T063)
+- [X] T070 [US3] ONNX Runtime embedding signal in `src/Strata.Core/Fingerprinting/EmbeddingSignal.cs` + HNSW index in `src/Strata.Corpus/Index/HnswIndex.cs` (depends T069, T040)
+- [X] T071 [US3] SC-004 ship/park decision: measure embedding recall delta on benchmark, wire into `Fingerprinter` or park with recorded rationale (depends T070, T067)
 - [ ] T072 [US3] Run Checkpoint A gate (SC-001); run quickstart Scenario 5 (depends T063, T067)
 
 **Checkpoint**: Accuracy is measured, reproducible, and published; matching credibility established.

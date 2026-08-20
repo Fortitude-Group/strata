@@ -27,6 +27,7 @@ public sealed class BinaryLoader : IBinaryLoader
         var linkage = Linkage.Unknown;
         var sections = (IReadOnlyList<Section>)[];
         var entryPoints = (IReadOnlyList<ulong>)[];
+        var symbols = (IReadOnlyList<Symbol>)[];
 
         switch (format)
         {
@@ -35,6 +36,7 @@ public sealed class BinaryLoader : IBinaryLoader
                     ElfReader.ElfHeader header = ElfReader.ReadHeader(data);
                     arch = header.Architecture;
                     sections = ElfReader.ReadSections(data, header);
+                    symbols = ElfReader.ReadFunctionSymbols(data, header, sections);
                     entryPoints = header.Entry != 0 ? [header.Entry] : [];
                     // A shared object or a .dynamic section implies dynamic linking; otherwise treat as static.
                     linkage = header.IsSharedObject || HasSection(sections, ".dynamic") ? Linkage.Dynamic : Linkage.Static;
@@ -77,7 +79,7 @@ public sealed class BinaryLoader : IBinaryLoader
             PackingStatus = packing,
             Sections = sections,
             EntryPoints = entryPoints,
-            Symbols = [], // symbol-table parsing lands with function recovery (T035); stripped is the default
+            Symbols = symbols, // present only when the binary is not stripped (the corpus case)
             Strings = strings,
             Constants = [],
             Image = data,

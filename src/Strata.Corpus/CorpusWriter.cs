@@ -83,14 +83,17 @@ public static class CorpusWriter
             using var fnCmd = conn.CreateCommand();
             fnCmd.CommandText = """
                 INSERT INTO function_signature
-                    (library_id, function_name, cfg_shape_hash, norm_insn_minhash, distinctiveness,
+                    (library_id, function_name, cfg_shape_hash, norm_insn_minhash, embedding, distinctiveness,
                      exact_version, version_low, version_high)
-                VALUES ($lib, $name, $cfg, $mh, $dist, $exact, $low, $high);
+                VALUES ($lib, $name, $cfg, $mh, $emb, $dist, $exact, $low, $high);
                 """;
             fnCmd.Parameters.AddWithValue("$lib", libId);
             fnCmd.Parameters.AddWithValue("$name", fn.FunctionName);
             fnCmd.Parameters.AddWithValue("$cfg", fn.CfgShapeHash.ToString(System.Globalization.CultureInfo.InvariantCulture));
             fnCmd.Parameters.AddWithValue("$mh", string.Join(',', fn.NormInsnMinHash));
+            fnCmd.Parameters.AddWithValue("$emb", fn.Embedding is { Count: > 0 }
+                ? string.Join(',', fn.Embedding.Select(v => v.ToString("R", System.Globalization.CultureInfo.InvariantCulture)))
+                : (object)System.DBNull.Value);
             fnCmd.Parameters.AddWithValue("$dist", fn.Distinctiveness);
             fnCmd.Parameters.AddWithValue("$exact", (object?)fn.ExactVersion ?? System.DBNull.Value);
             fnCmd.Parameters.AddWithValue("$low", (object?)fn.VersionLow ?? System.DBNull.Value);
