@@ -34,15 +34,32 @@ public static class CycloneDxEmitter
         }
 
         bom.Components = [];
+        var vulnerabilities = new List<CycloneDX.Models.Vulnerabilities.Vulnerability>();
         foreach (IdentifiedComponent c in result.Components)
         {
-            bom.Components.Add(ToComponent(c));
+            string bomRef = "strata-comp-" + c.LibraryName;
+            bom.Components.Add(ToComponent(c, bomRef));
+            foreach (VulnerabilityReference v in c.Vulnerabilities)
+            {
+                vulnerabilities.Add(new CycloneDX.Models.Vulnerabilities.Vulnerability
+                {
+                    Id = v.Id,
+                    Detail = $"source={v.Source}; severity={v.Severity ?? "unknown"}; snapshot={v.SnapshotVersion}"
+                        + (v.AppliesToRange ? "; appliesToRange=true" : string.Empty),
+                    Affects = [new CycloneDX.Models.Vulnerabilities.Affects { Ref = bomRef }],
+                });
+            }
+        }
+
+        if (vulnerabilities.Count > 0)
+        {
+            bom.Vulnerabilities = vulnerabilities;
         }
 
         return Serializer.Serialize(bom);
     }
 
-    private static Component ToComponent(IdentifiedComponent c)
+    private static Component ToComponent(IdentifiedComponent c, string bomRef)
     {
         var props = new List<Property>
         {
@@ -65,6 +82,7 @@ public static class CycloneDxEmitter
 
         var component = new Component
         {
+            BomRef = bomRef,
             Type = Component.Classification.Library,
             Name = c.LibraryName,
             Version = c.Version.Kind == VersionKind.Exact ? c.Version.Exact : null,

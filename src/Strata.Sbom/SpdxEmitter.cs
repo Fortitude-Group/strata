@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Strata.Core.Model;
@@ -24,6 +25,11 @@ public static class SpdxEmitter
                 evidenceLines.Add($"[{e.Signal}] {e.Detail}");
             }
 
+            string vulnPart = c.Vulnerabilities.Count > 0
+                ? "; vulnerabilities=" + string.Join(
+                    ",", c.Vulnerabilities.Select(v => v.AppliesToRange ? $"{v.Id}(range)" : v.Id))
+                : string.Empty;
+
             var pkg = new JsonObject
             {
                 ["name"] = c.LibraryName,
@@ -35,7 +41,7 @@ public static class SpdxEmitter
                 ["copyrightText"] = "NOASSERTION",
                 ["comment"] =
                     $"strata:confidence={c.Confidence.ToString("F3", CultureInfo.InvariantCulture)}; " +
-                    $"versionKind={c.Version.Kind}; evidence={string.Join(" | ", evidenceLines)}",
+                    $"versionKind={c.Version.Kind}; evidence={string.Join(" | ", evidenceLines)}" + vulnPart,
             };
             packages.Add(pkg);
             i++;

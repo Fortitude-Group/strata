@@ -16,6 +16,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!-- Ship as `strata`. Project-scoped so it does NOT cascade to ProjectReferences. -->
+    <AssemblyName>strata</AssemblyName>
   </PropertyGroup>
 
 </Project>

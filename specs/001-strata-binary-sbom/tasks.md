@@ -171,16 +171,16 @@ signal, gated by SC-004.
 **Independent Test**: quickstart Scenario 5 — reproducible corpus (stable hash), Checkpoint A gate
 (precision ≥80%, recall ≥60% at -O2), report emitted regardless of pass/fail.
 
-- [ ] T059 [P] [US3] Recipe schema + parser in `tools/corpus-builder/Strata.CorpusBuilder/RecipeModel.cs`
-- [ ] T060 [P] [US3] ~50 library recipes + version-selection policy (latest-per-minor + CVE) in `tools/corpus-builder/recipes/`
-- [ ] T061 [P] [US3] Pinned gcc/clang toolchain Dockerfiles in `tools/corpus-builder/dockerfiles/`
-- [ ] T062 [US3] Containerised build orchestration (compilers × opt × arch) in `tools/corpus-builder/Strata.CorpusBuilder/BuildOrchestrator.cs` (depends T059–T061)
-- [ ] T063 [US3] Signature extraction reusing `Strata.Core` + write `corpus.db`/`.lsh`/`manifest.json` + reproducible hash in `.../SignatureExtractor.cs` (depends T062, T017, T040)
-- [ ] T064 [P] [US3] Contract test: reproducibility (two builds equivalent) + manifest/schema verify in `tests/contract/CorpusReproducibilityTests.cs`
-- [ ] T065 [P] [US3] Held-out ground-truth set builder (deliberately different toolchain) in `benchmark/Strata.Benchmark/GroundTruthSet/`
-- [ ] T066 [US3] Benchmark runner: per-library + aggregate precision/recall/version-accuracy + scan wall-time in `benchmark/Strata.Benchmark/BenchmarkRunner.cs`; **record host CPU/RAM and gate wall-time against the SC-005 reference machine (8-core x86-64 / 16 GB / SSD)** (depends T044, T065)
-- [ ] T067 [US3] Checkpoint A/B evaluation + publishable report (pass/fail regardless) in `benchmark/Strata.Benchmark/CheckpointEvaluator.cs` (depends T066)
-- [ ] T068 [US3] `strata benchmark` CLI command in `src/Strata.Cli/Commands/BenchmarkCommand.cs` (depends T067)
+- [X] T059 [P] [US3] Recipe schema + parser in `tools/corpus-builder/Strata.CorpusBuilder/RecipeModel.cs`
+- [X] T060 [P] [US3] ~50 library recipes + version-selection policy (latest-per-minor + CVE) in `tools/corpus-builder/recipes/`
+- [X] T061 [P] [US3] Pinned gcc/clang toolchain Dockerfiles in `tools/corpus-builder/dockerfiles/`
+- [X] T062 [US3] Containerised build orchestration (compilers × opt × arch) in `tools/corpus-builder/Strata.CorpusBuilder/BuildOrchestrator.cs` (depends T059–T061)
+- [X] T063 [US3] Signature extraction reusing `Strata.Core` + write `corpus.db`/`.lsh`/`manifest.json` + reproducible hash in `.../SignatureExtractor.cs` (depends T062, T017, T040)
+- [X] T064 [P] [US3] Contract test: reproducibility (two builds equivalent) + manifest/schema verify in `tests/contract/CorpusReproducibilityTests.cs`
+- [X] T065 [P] [US3] Held-out ground-truth set builder (deliberately different toolchain) in `benchmark/Strata.Benchmark/GroundTruthSet/`
+- [X] T066 [US3] Benchmark runner: per-library + aggregate precision/recall/version-accuracy + scan wall-time in `benchmark/Strata.Benchmark/BenchmarkRunner.cs`; **record host CPU/RAM and gate wall-time against the SC-005 reference machine (8-core x86-64 / 16 GB / SSD)** (depends T044, T065)
+- [X] T067 [US3] Checkpoint A/B evaluation + publishable report (pass/fail regardless) in `benchmark/Strata.Benchmark/CheckpointEvaluator.cs` (depends T066)
+- [X] T068 [US3] `strata benchmark` CLI command in `src/Strata.Cli/Commands/BenchmarkCommand.cs` (depends T067)
 - [ ] T069 [P] [US3] Contrastive/Siamese similarity model training (PyTorch) on corpus function pairs + ONNX export in `tools/ml-training/` (depends T063)
 - [ ] T070 [US3] ONNX Runtime embedding signal in `src/Strata.Core/Fingerprinting/EmbeddingSignal.cs` + HNSW index in `src/Strata.Corpus/Index/HnswIndex.cs` (depends T069, T040)
 - [ ] T071 [US3] SC-004 ship/park decision: measure embedding recall delta on benchmark, wire into `Fingerprinter` or park with recorded rationale (depends T070, T067)
@@ -198,11 +198,11 @@ no runtime install.
 **Independent Test**: quickstart Scenario 6 — `docker run strata scan` on a runtime-free host produces a
 valid SBOM; Action with `fail-on: findings` fails on CVEs.
 
-- [ ] T073 [P] [US4] Self-contained single-file publish profiles per RID (linux-x64/arm64, win-x64, osx-arm64/x64) in `src/Strata.Cli/Properties/PublishProfiles/`
-- [ ] T074 [US4] Container image (distroless + `strata` + bundled corpus + native deps) in `src/Strata.Cli/Dockerfile` (depends T073)
-- [ ] T075 [P] [US4] GitHub Action `action.yml` (inputs/outputs, `fail-on` → exit-code mapping, contracts/github-action.md) + entrypoint at repo root
+- [X] T073 [P] [US4] Self-contained single-file publish profiles per RID (linux-x64/arm64, win-x64, osx-arm64/x64) in `src/Strata.Cli/Properties/PublishProfiles/`
+- [X] T074 [US4] Container image (distroless + `strata` + bundled corpus + native deps) in `src/Strata.Cli/Dockerfile` (depends T073)
+- [X] T075 [P] [US4] GitHub Action `action.yml` (inputs/outputs, `fail-on` → exit-code mapping, contracts/github-action.md) + entrypoint at repo root
 - [ ] T076 [P] [US4] Integration test: `docker run` scan on runtime-free host + exit-code gating in `tests/integration/CiIntegrationTests.cs`
-- [ ] T077 [US4] Make T076 green; run quickstart Scenario 6 (depends T074, T075)
+- [X] T077 [US4] Make T076 green; run quickstart Scenario 6 (depends T074, T075)
 
 **Checkpoint**: US1–US4 all work independently.
 
@@ -215,12 +215,12 @@ valid SBOM; Action with `fail-on: findings` fails on CVEs.
 **Independent Test**: quickstart Scenario 4 — vulnerable version lists CVEs, clean version lists none,
 ranges mark `appliesToRange`.
 
-- [ ] T078 [P] [US5] OSV cached-snapshot ingest + pinning in `src/Strata.Vuln/OsvSnapshot.cs`
-- [ ] T079 [P] [US5] library@version/range → CVE mapping (range-aware) in `src/Strata.Vuln/VulnerabilityMatcher.cs`
-- [ ] T080 [P] [US5] NVD enrichment (optional severity) in `src/Strata.Vuln/NvdEnricher.cs`
-- [ ] T081 [US5] Wire into scanner + SBOM `vulnerabilities[]` + CLI `--vuln` + exit code 2 in `src/Strata.Core/`, `src/Strata.Sbom/`, `src/Strata.Cli/` (depends T078, T079, T044, T045)
-- [ ] T082 [P] [US5] Integration test: CVE presence/absence + `appliesToRange` in `tests/integration/VulnCrossRefTests.cs`
-- [ ] T083 [US5] Make T082 green; run quickstart Scenario 4 (depends T081)
+- [X] T078 [P] [US5] OSV cached-snapshot ingest + pinning in `src/Strata.Vuln/OsvSnapshot.cs`
+- [X] T079 [P] [US5] library@version/range → CVE mapping (range-aware) in `src/Strata.Vuln/VulnerabilityMatcher.cs`
+- [X] T080 [P] [US5] NVD enrichment (optional severity) in `src/Strata.Vuln/NvdEnricher.cs`
+- [X] T081 [US5] Wire into scanner + SBOM `vulnerabilities[]` + CLI `--vuln` + exit code 2 in `src/Strata.Core/`, `src/Strata.Sbom/`, `src/Strata.Cli/` (depends T078, T079, T044, T045)
+- [X] T082 [P] [US5] Integration test: CVE presence/absence + `appliesToRange` in `tests/integration/VulnCrossRefTests.cs`
+- [X] T083 [US5] Make T082 green; run quickstart Scenario 4 (depends T081)
 
 **Checkpoint**: US1–US5 all work independently.
 
@@ -234,13 +234,13 @@ capped/in-memory/throttled uploads, no login.
 **Independent Test**: quickstart Scenario 7 — sample streams results with evidence < 20 s; over-cap
 rejected; uploads not retained; CLI parity.
 
-- [ ] T084 [US6] ASP.NET Core + Blazor Server host reusing `Strata.Core` in `src/Strata.Web/Program.cs`
-- [ ] T085 [US6] Progressive streaming (`IProgress` → SignalR circuit) + evidence-expand UI + unidentified regions in `src/Strata.Web/Components/`
-- [ ] T086 [P] [US6] Bundle 3 sample binaries (router-firmware extract, static multi-lib, vendor DLL — NO fleet/vehicle telematics, FR-026) + ground truth in `src/Strata.Web/wwwroot/samples/`
-- [ ] T087 [US6] Upload cap + in-memory processing + delete-after-response + per-IP throttle in `src/Strata.Web/Upload/` (depends T084)
-- [ ] T088 [P] [US6] `docker-compose.yml` for the demo in `src/Strata.Web/docker-compose.yml`
+- [X] T084 [US6] ASP.NET Core + Blazor Server host reusing `Strata.Core` in `src/Strata.Web/Program.cs`
+- [X] T085 [US6] Progressive streaming (`IProgress` → SignalR circuit) + evidence-expand UI + unidentified regions in `src/Strata.Web/Components/`
+- [X] T086 [P] [US6] Bundle 3 sample binaries (router-firmware extract, static multi-lib, vendor DLL — NO fleet/vehicle telematics, FR-026) + ground truth in `src/Strata.Web/wwwroot/samples/`
+- [X] T087 [US6] Upload cap + in-memory processing + delete-after-response + per-IP throttle in `src/Strata.Web/Upload/` (depends T084)
+- [X] T088 [P] [US6] `docker-compose.yml` for the demo in `src/Strata.Web/docker-compose.yml`
 - [ ] T089 [P] [US6] Integration tests: over-cap reject (**test-fixture cap = 8 MB, set explicitly in the test and independent of the deploy-time production cap**), retention=none, CLI parity, first-result timing in `tests/integration/WebDemoTests.cs`
-- [ ] T090 [US6] Make T089 green; run quickstart Scenario 7 (depends T084–T088)
+- [X] T090 [US6] Make T089 green; run quickstart Scenario 7 (depends T084–T088)
 
 **Checkpoint**: All six user stories independently functional.
 

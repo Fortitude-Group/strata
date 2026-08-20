@@ -45,6 +45,13 @@ public static class ScanCommand
                 result = scanner.Scan(fs, Path.GetFileName(binaryPath), corpus, options);
             }
 
+            // Thin CVE cross-reference (FR-019), on by default; --vuln off disables it.
+            if (args.Get("vuln") != "off")
+            {
+                var xref = new Strata.Vuln.VulnerabilityCrossReference();
+                result = result with { Components = xref.Enrich(result.Components) };
+            }
+
             EmitSboms(result, args, stdout);
             EmitReport(result, args, options.Match.MinConfidence, stdout);
 

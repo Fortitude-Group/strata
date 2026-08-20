@@ -71,6 +71,23 @@ public sealed class ScanEndToEndTests : IDisposable
     }
 
     [Fact]
+    public void Scan_flags_known_cve_and_returns_findings_exit_code()
+    {
+        byte[] elf = TestBinaries.MakeElfWithStrings(["OpenSSL 1.1.1k  25 Mar 2021"]);
+        string bin = Path.Combine(_dir, "ssl.elf");
+        File.WriteAllBytes(bin, elf);
+        string sbom = Path.Combine(_dir, "ssl.sbom");
+
+        var stdout = new StringWriter();
+        ArgMap args = ArgMap.Parse(
+            ["scan", bin, "--corpus", _corpusDb, "--output", sbom, "--report", "json", "--deterministic"], 1);
+        int code = ScanCommand.Run(args, stdout, new StringWriter());
+
+        Assert.Equal(ExitCodes.FindingsNeedAttention, code);          // US5: CVE present → exit 2 (FR-019/FR-020)
+        Assert.Contains("CVE-2021-3712", stdout.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Deterministic_scan_produces_identical_sbom_bytes()
     {
         byte[] elf = TestBinaries.MakeElfWithStrings(["deflate 1.2.11 Copyright 1995-2017 Jean-loup Gailly and Mark Adler "]);
@@ -88,7 +105,7 @@ public sealed class ScanEndToEndTests : IDisposable
     private void RunScan(string bin, string outPath)
     {
         ArgMap args = ArgMap.Parse(
-            ["scan", bin, "--corpus", _corpusDb, "--format", "cyclonedx", "--output", outPath, "--report", "none", "--deterministic"],
+            ["scan", bin, "--corpus", _corpusDb, "--format", "cyclonedx", "--output", outPath, "--report", "none", "--deterministic", "--vuln", "off"],
             1);
         int code = ScanCommand.Run(args, new StringWriter(), new StringWriter());
         Assert.Equal(ExitCodes.Success, code);
