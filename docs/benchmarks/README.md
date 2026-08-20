@@ -32,47 +32,50 @@ the exact version every time — clearing Checkpoint A on real cross-compiler bi
 - This is a **single-library** corpus (zlib). The precision figure does not yet stress cross-library
   false positives at scale; that needs the full ~50-library corpus (in progress).
 
-## Checkpoint A — 16-library, real cross-compiler — **PASS** (2026-08-20)
+## Checkpoint A: 19-library, real cross-compiler. PASS (2026-08-20)
 
-**Setup.** Corpus built from **gcc `-O2/-O3/-Os`** across **16 real libraries** — zlib, libpng, cJSON,
-lz4, bzip2, zstd, brotli, zopfli, fastlz, inih, linenoise, utf8proc, http_parser, md4c, yyjson,
-monocypher (60 binaries; 7507 function + 13755 string signatures). Held-out set: the same libraries
-compiled with **clang `-O2/-O3/-Os`, stripped** (60 binaries) — a genuinely different compiler.
-Identification threshold 0.25.
+**Setup.** Corpus built from gcc `-O2/-O3/-Os` across **19 real libraries**: zlib, libpng, cJSON, lz4,
+bzip2, zstd, brotli, zopfli, fastlz, libdeflate, heatshrink, inih, linenoise, utf8proc, http_parser,
+md4c, yyjson, monocypher, mongoose (69 binaries; 8330 function + 15299 string signatures). The held-out
+set is the same libraries compiled with clang `-O2/-O3/-Os` and stripped (69 binaries), a genuinely
+different compiler. Identification threshold 0.25.
 
 | Metric | Result | Checkpoint A gate | Verdict |
 |--------|--------|-------------------|---------|
-| Aggregate precision | **100.0%** | ≥ 80% | ✅ |
-| Aggregate recall | **75.0%** | ≥ 60% | ✅ |
-| Version-resolution accuracy | **93.3%** | — | ✅ |
-| **Checkpoint A** | | | **✅ PASS** |
+| Aggregate precision | **100.0%** | >= 80% | PASS |
+| Aggregate recall | **73.9%** | >= 60% | PASS |
+| Version-resolution accuracy | **94.1%** | (Checkpoint B: >= 70%) | PASS |
+| **Checkpoint A** | | | **PASS** |
 
-**13 of 16 libraries identify at 100% precision AND 100% recall** cross-compiler (zlib, libpng, cJSON,
-bzip2, brotli, zopfli, fastlz, inih, linenoise, utf8proc, http_parser, md4c, yyjson). **Zero false
-positives anywhere** — precision is 100% across every library. Full report:
-[`checkpoint-a-multi-library.json`](checkpoint-a-multi-library.json).
+**15 of 19 libraries identify at 100% precision and 100% recall** cross-compiler. Precision is 100%
+across every single library: there are **zero false positives anywhere** in 69 stripped, clang-built,
+held-out binaries. Full report: [`checkpoint-a-multi-library.json`](checkpoint-a-multi-library.json).
 
-**This run empirically answers "does more corpus help?"** The 9-library corpus scored **71% precision**
-(bzip2 over-reported everywhere). Adding **compression counter-examples** (brotli, zopfli, fastlz,
-zstd) took precision to **100%** — because IDF distinctiveness could finally see that bzip2's
-"distinctive" bit/buffer functions are actually *generic compression code* shared across many libraries,
-and down-weight them. That is the mechanism, measured: **precision scales with corpus *coverage of each
-domain*, not raw count** — more compression libraries fixed a compression false-positive, more JSON
-parsers would not have.
+**This run answers the question "does more corpus help?" with a measured yes, up to a point.** The
+9-library corpus scored 71% precision (bzip2 reported itself in most binaries). Adding compression
+counter-examples (brotli, zopfli, fastlz, zstd, libdeflate) took precision to 100%, because IDF
+distinctiveness could finally see that bzip2's apparently-distinctive bit and buffer functions are
+generic compression code shared across many libraries, and down-weight them. Precision then held at
+100% as the corpus grew from 16 to 19 libraries. The lesson is concrete: precision scales with corpus
+coverage of each *domain*, not with raw library count. More compression libraries fixed a compression
+false positive. Forty more JSON parsers would not have.
 
-**The remaining gap is recall on 3 string-poor libraries** — lz4, zstd, monocypher — which are missed
-(recall 0, but still zero false positives). These are tight, optimised, string-sparse libraries (crypto
-constant-time code; compression inner loops) whose functions diverge sharply between gcc and clang, so
-neither the string signal nor exact-heuristic function matching fires cross-compiler. This is precisely
-the case the **Checkpoint-B learned embedding** is designed to close (fuzzy cross-compiler function
-similarity) — measured here as the honest next lever, not assumed.
+**The remaining gap is recall on four string-poor libraries**: lz4, zstd, libdeflate, monocypher. Each
+is missed (recall 0), yet each still produces zero false positives. They are tight, heavily optimised,
+string-sparse libraries: compression inner loops and crypto constant-time code. Their functions are
+compiled very differently by gcc and clang (unrolling, vectorisation, scheduling), so the string signal
+has little to grip and the exact-heuristic function match does not fire across compilers. Adding more
+libraries will not recover them; that is the job of the Checkpoint-B learned embedding (fuzzy
+cross-compiler function similarity), or of adding those specific libraries at more optimisation points.
+This is measured as the honest next lever, not assumed.
 
-**Diagnosis journey (all measured, per Principle XI).** The first cross-library run was 20% precision;
-each fix was driven by reading the actual evidence: excluded CRT/linker stubs and metadata strings
-(section names, `GLIBC_*`), switched to IDF distinctiveness, added an 8-instruction minimum-function
-gate, moved to an optimized-only corpus, demoted CFG-shape agreement from a match-maker to a nudge, and
-finally expanded the corpus with compression counter-examples. Absolute-mass confidence saturation was
-tried and **reverted** (measured: it dropped precision to 31%).
+**Diagnosis journey (every step measured, per Principle XI).** The first cross-library run was 20%
+precision. Each fix came from reading the actual evidence: excluded CRT and linker stubs and metadata
+strings (section names, `GLIBC_*` tags); switched to IDF distinctiveness; added an 8-instruction
+minimum-function gate; moved to an optimised-only corpus; demoted CFG-shape agreement from a match-maker
+to a small nudge on real instruction similarity; and expanded the corpus with compression
+counter-examples. An absolute-mass confidence formula was tried and reverted once it measured a drop to
+31% precision.
 
 **Quality improvements this run** (all principled, all kept): exclude CRT/linker stubs and
 compiler-runtime functions from the corpus; **IDF-style distinctiveness** (ubiquitous signatures → ~0);

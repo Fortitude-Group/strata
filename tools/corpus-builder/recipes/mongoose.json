@@ -1,0 +1,9 @@
+{
+  "name": "mongoose",
+  "purl": "pkg:generic/mongoose",
+  "knownLicense": "GPL-2.0",
+  "sourceUrl": "https://github.com/cesanta/mongoose",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "7.14", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "libdeflate",
+  "purl": "pkg:generic/libdeflate",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/ebiggers/libdeflate",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.19", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

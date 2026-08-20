@@ -1,0 +1,9 @@
+{
+  "name": "heatshrink",
+  "purl": "pkg:generic/heatshrink",
+  "knownLicense": "ISC",
+  "sourceUrl": "https://github.com/atomicobject/heatshrink",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "0.4.1", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}
