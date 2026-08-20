@@ -52,3 +52,8 @@ tests/fixtures/out/
 Thumbs.db
 *.tmp
 *.swp
+
+# Local Claude Code tooling (not part of Strata)
+.claude/
+skills-lock.json
+.specify/scripts/__pycache__/
