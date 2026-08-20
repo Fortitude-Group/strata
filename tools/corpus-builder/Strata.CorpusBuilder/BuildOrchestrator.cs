@@ -123,7 +123,16 @@ public static class BuildOrchestrator
             File.Delete(dbPath);
         }
 
-        CorpusWriter.Write(dbPath, corpusVersion, withDistinctiveness, fnWithDistinctiveness, modelVersion: null);
+        // Bundle the embedding model into the corpus artefact so a scan is self-contained: `strata scan
+        // --corpus <db>` auto-loads a sibling model.onnx.
+        string? modelVersion = null;
+        if (model is not null && modelPath is not null && File.Exists(modelPath))
+        {
+            File.Copy(modelPath, Path.Combine(outDir, "model.onnx"), overwrite: true);
+            modelVersion = Path.GetFileNameWithoutExtension(modelPath);
+        }
+
+        CorpusWriter.Write(dbPath, corpusVersion, withDistinctiveness, fnWithDistinctiveness, modelVersion);
 
         string hash = ComputeReproducibleHash(withDistinctiveness, fnWithDistinctiveness);
         List<string> optLevels = recipes
@@ -140,7 +149,7 @@ public static class BuildOrchestrator
             OptLevels = optLevels,
             Arches = archesSeen.ToList(),
             LibraryCount = librariesBuilt.Count,
-            ModelVersion = "parked",
+            ModelVersion = modelVersion ?? "parked",
             BuildReproducibleHash = hash,
         };
 

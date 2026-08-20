@@ -36,7 +36,9 @@ public static class ScanCommand
             {
                 Load = new LoadOptions { MaxInputBytes = maxBytes },
                 Match = new MatchOptions { MinConfidence = args.GetDouble("min-confidence", 0.25) },
-                ModelPath = args.Get("model"),
+                // Use an explicit --model, else the model bundled alongside the corpus (self-contained
+                // artefact), else none. The corpus builder writes model.onnx next to corpus.db.
+                ModelPath = args.Get("model") ?? SiblingModel(args.Get("corpus")),
             };
 
             var log = args.Has("verbose")
@@ -80,6 +82,19 @@ public static class ScanCommand
 
     private static ICorpus ResolveCorpus(string? corpusPath) =>
         string.IsNullOrEmpty(corpusPath) ? SeedCorpus.AsCorpus() : SqliteCorpus.Load(corpusPath);
+
+    /// <summary>A `model.onnx` sitting next to the corpus DB, if present, so the artefact is self-contained.</summary>
+    private static string? SiblingModel(string? corpusPath)
+    {
+        if (string.IsNullOrEmpty(corpusPath))
+        {
+            return null;
+        }
+
+        string? dir = Path.GetDirectoryName(Path.GetFullPath(corpusPath));
+        string candidate = Path.Combine(dir ?? ".", "model.onnx");
+        return File.Exists(candidate) ? candidate : null;
+    }
 
     private static void EmitSboms(ScanResult result, ArgMap args, TextWriter stdout)
     {
