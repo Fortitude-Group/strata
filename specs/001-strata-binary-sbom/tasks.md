@@ -19,8 +19,11 @@ see the **Claude-Flow Parallel Orchestration** section for the fan-out plan the 
 **All 104 tasks `[X]`.** Full solution builds **0 warnings / 0 errors** (13 projects); **87 tests green**;
 `dotnet format` clean. Validated on **real binaries**: Checkpoint A PASS on cross-compiler stripped zlib
 (precision/recall/version 100%/100%/100%), SC-005 perf ~0.47 s on a 3.4 MB/40k-function ELF, ELF+PE+Mach-O
-scans producing valid CycloneDX 1.6 + SPDX 2.3 with evidence + CVEs. Checkpoint-B embedding built, measured,
-and **parked per SC-004** (0-match gain on the tiny corpus). AArch64 (Capstone) + x86-64 (Iced) both decode.
+scans producing valid CycloneDX 1.6 + SPDX 2.3 with evidence + CVEs. On a 21-library real cross-compiler
+benchmark: **Checkpoint A PASS** (100% precision, heuristics) and **Checkpoint B PASS** (embedding lifts
+recall 76% to 92%, +16pts past the SC-004 bar; it ships, bundled in the corpus artefact and auto-loaded).
+19 of 21 libraries at 100% precision and 100% recall incl mbedTLS and expat. AArch64 (Capstone) + x86-64
+(Iced) both decode.
 An adversarial security review found two quadratic hot loops + a missing input cap — all fixed and
 re-validated. Local `master` only, **unpushed** per owner instruction.
 
