@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Strata.Web is a Microsoft.NET.Sdk.Web project; this project references its types directly
+         (IWebHostEnvironment, IOptions<T>, etc.) so it needs the shared ASP.NET Core framework too. -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Strata.Web\Strata.Web.csproj" />
+    <ProjectReference Include="..\..\src\Strata.Core\Strata.Core.csproj" />
+    <ProjectReference Include="..\..\src\Strata.Corpus\Strata.Corpus.csproj" />
+  </ItemGroup>
+
+</Project>

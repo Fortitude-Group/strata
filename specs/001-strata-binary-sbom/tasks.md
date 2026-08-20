@@ -97,7 +97,7 @@ story depends on.
 - [X] T019 [P] Diagnostics: structured logging + per-stage telemetry (Principle IV) in `src/Strata.Core/Diagnostics/`
 - [X] T020 [P] Errors: `UnsupportedFormatException`/`CorpusSchemaMismatchException`/`OutOfEnvelopeException` + `ExitCodes` map (contracts/cli.md) in `src/Strata.Core/Errors/` + `src/Strata.Cli/ExitCodes.cs`
 - [X] T021 Seed corpus generator: compile a handful of known libs into a small fixture corpus so US1 is testable, in `tests/fixtures/build-seed-corpus.ps1` (depends T017, T018)
-- [ ] T022 [P] Fixture builder: compile small stripped static known-composition binaries + ground-truth manifests in `tests/fixtures/build-fixtures.ps1`
+- [X] T022 [P] Fixture builder: compile small stripped static known-composition binaries + ground-truth manifests in `tests/fixtures/build-fixtures.ps1`
 - [X] T023 [P] Determinism test harness: golden-file infra + `--deterministic` plumbing hooks in `tests/contract/DeterminismHarness.cs`
 - [X] T024 Composition root: `StrataEngine` factory + `src/Strata.Cli/Program.cs` skeleton wiring interfaces (depends T015)
 
@@ -210,7 +210,7 @@ valid SBOM; Action with `fail-on: findings` fails on CVEs.
 - [X] T073 [P] [US4] Self-contained single-file publish profiles per RID (linux-x64/arm64, win-x64, osx-arm64/x64) in `src/Strata.Cli/Properties/PublishProfiles/`
 - [X] T074 [US4] Container image (distroless + `strata` + bundled corpus + native deps) in `src/Strata.Cli/Dockerfile` (depends T073)
 - [X] T075 [P] [US4] GitHub Action `action.yml` (inputs/outputs, `fail-on` → exit-code mapping, contracts/github-action.md) + entrypoint at repo root
-- [ ] T076 [P] [US4] Integration test: `docker run` scan on runtime-free host + exit-code gating in `tests/integration/CiIntegrationTests.cs`
+- [X] T076 [P] [US4] Integration test: `docker run` scan on runtime-free host + exit-code gating in `tests/integration/CiIntegrationTests.cs`
 - [X] T077 [US4] Make T076 green; run quickstart Scenario 6 (depends T074, T075)
 
 **Checkpoint**: US1–US4 all work independently.
@@ -248,7 +248,7 @@ rejected; uploads not retained; CLI parity.
 - [X] T086 [P] [US6] Bundle 3 sample binaries (router-firmware extract, static multi-lib, vendor DLL — NO fleet/vehicle telematics, FR-026) + ground truth in `src/Strata.Web/wwwroot/samples/`
 - [X] T087 [US6] Upload cap + in-memory processing + delete-after-response + per-IP throttle in `src/Strata.Web/Upload/` (depends T084)
 - [X] T088 [P] [US6] `docker-compose.yml` for the demo in `src/Strata.Web/docker-compose.yml`
-- [ ] T089 [P] [US6] Integration tests: over-cap reject (**test-fixture cap = 8 MB, set explicitly in the test and independent of the deploy-time production cap**), retention=none, CLI parity, first-result timing in `tests/integration/WebDemoTests.cs`
+- [X] T089 [P] [US6] Integration tests: over-cap reject (**test-fixture cap = 8 MB, set explicitly in the test and independent of the deploy-time production cap**), retention=none, CLI parity, first-result timing in `tests/integration/WebDemoTests.cs`
 - [X] T090 [US6] Make T089 green; run quickstart Scenario 7 (depends T084–T088)
 
 **Checkpoint**: All six user stories independently functional.
@@ -258,13 +258,13 @@ rejected; uploads not retained; CLI parity.
 ## Phase 9: Polish & Cross-Cutting Concerns
 
 - [X] T091 [P] README + R&D page copy: honesty framing, cite primary CRA sources, never "CRA compliant" (FR-018) in `docs/`
-- [ ] T092 [P] Public API docs for `Strata.Core` surface (contracts/engine-api.md) in `docs/`
+- [X] T092 [P] Public API docs for `Strata.Core` surface (contracts/engine-api.md) in `docs/`
 - [ ] T093 Performance pass vs SC-005 (40 MB < 5 min on the reference 8-core x86-64 / 16 GB / SSD machine) — profile hot paths in `src/Strata.Core/`
-- [ ] T094 [P] Security hardening: upload path sanitization, resource/time limits, run security scan
-- [ ] T095 [P] Additional unit tests closing coverage on public contracts (Principle III) across `tests/*/unit/`
+- [X] T094 [P] Security hardening: upload path sanitization, resource/time limits, run security scan
+- [X] T095 [P] Additional unit tests closing coverage on public contracts (Principle III) across `tests/*/unit/`
 - [X] T096 Publish versioned corpus + benchmark artefacts (Principle II, SC-010)
 - [ ] T097 Full `quickstart.md` validation run (all scenarios) + tracker sync (Principle VII)
-- [ ] T098 SemVer + changelog/migration notes for public contracts (Principle II)
+- [X] T098 SemVer + changelog/migration notes for public contracts (Principle II)
 
 ---
 
@@ -281,9 +281,9 @@ components with evidence (quickstart Scenarios 1–2 re-run for the new formats)
 - [X] T099 [P] PE reader (x86-64 + AArch64): COFF/PE headers, sections, import/export tables, strings/constants in `src/Strata.Core/Ingestion/PeReader.cs`
 - [X] T100 [P] Mach-O reader (x86-64 + arm64): load commands, sections, symbol/string tables, constants in `src/Strata.Core/Ingestion/MachOReader.cs`
 - [X] T101 PE/Mach-O format detection + packing detection wired into `FormatDetector`/`PackingDetector`/`BinaryLoader` in `src/Strata.Core/Ingestion/` (depends T099, T100)
-- [ ] T102 [P] PE + Mach-O known-composition fixtures + ground-truth manifests in `tests/fixtures/build-fixtures.ps1`
-- [ ] T103 [P] Integration tests: scan PE and Mach-O fixtures → expected components in `tests/integration/PeMachOScanTests.cs`
-- [ ] T104 Extend corpus builder to emit PE/Mach-O signatures (add Windows/macOS toolchain targets) in `tools/corpus-builder/` (depends T062); re-run quickstart Scenarios 1–2 for PE and Mach-O
+- [X] T102 [P] PE + Mach-O known-composition fixtures + ground-truth manifests in `tests/fixtures/build-fixtures.ps1`
+- [X] T103 [P] Integration tests: scan PE and Mach-O fixtures → expected components in `tests/integration/PeMachOScanTests.cs`
+- [X] T104 Extend corpus builder to emit PE/Mach-O signatures (add Windows/macOS toolchain targets) in `tools/corpus-builder/` (depends T062); re-run quickstart Scenarios 1–2 for PE and Mach-O
 
 **Checkpoint**: FR-001 fully satisfied across ELF, PE, and Mach-O.
 

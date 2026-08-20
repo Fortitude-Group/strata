@@ -15,6 +15,7 @@
     <Project Path="tests/Strata.Core.Tests/Strata.Core.Tests.csproj" />
     <Project Path="tests/Strata.Corpus.Tests/Strata.Corpus.Tests.csproj" />
     <Project Path="tests/Strata.Sbom.Tests/Strata.Sbom.Tests.csproj" />
+    <Project Path="tests/Strata.Web.Tests/Strata.Web.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/" />
   <Folder Name="/tools/corpus-builder/">

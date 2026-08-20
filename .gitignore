@@ -36,6 +36,7 @@ strata-corpus-*/
 tests/fixtures/*.elf
 tests/fixtures/*.bin
 tests/fixtures/build/
+tests/fixtures/out/
 
 # Secrets / env
 .env
