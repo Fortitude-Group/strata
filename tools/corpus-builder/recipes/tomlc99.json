@@ -1,0 +1,9 @@
+{
+  "name": "tomlc99",
+  "purl": "pkg:generic/tomlc99",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/cktan/tomlc99",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.0", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

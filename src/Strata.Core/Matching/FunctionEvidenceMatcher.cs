@@ -111,10 +111,13 @@ public sealed class FunctionEvidenceMatcher
         {
             double sim = MinHash.Similarity(target.NormInsnMinHash, candidate.NormInsnMinHash);
 
-            // Exact CFG-shape agreement is corroborating evidence on top of instruction similarity.
-            if (candidate.CfgShapeHash == target.CfgShapeHash)
+            // CFG-shape agreement is only a small corroborating NUDGE on top of real instruction
+            // similarity — NOT a match-maker. CFG-shape is coarse (block count + degree sequence), so
+            // many unrelated functions collide; promoting those to a match was the dominant false-positive
+            // source across structurally-similar libraries.
+            if (candidate.CfgShapeHash == target.CfgShapeHash && sim > 0.3)
             {
-                sim = Math.Max(sim, 0.75);
+                sim = Math.Min(1.0, sim + 0.1);
             }
 
             // Learned-embedding channel: cosine of the two embeddings can surface a match the discrete

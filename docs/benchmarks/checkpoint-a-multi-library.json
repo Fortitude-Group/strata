@@ -1,25 +1,25 @@
 {
   "checkpoint": "A",
-  "corpusVersion": "multi-opt-1.0.0",
-  "binaryCount": 24,
-  "aggregatePrecision": 0.6666666666666666,
-  "aggregateRecall": 0.75,
-  "versionResolutionAccuracy": 1,
-  "totalWallTimeMilliseconds": 645.4965000000001,
+  "corpusVersion": "multi9-1.0.0",
+  "binaryCount": 39,
+  "aggregatePrecision": 1,
+  "aggregateRecall": 0.6923076923076923,
+  "versionResolutionAccuracy": 0.8888888888888888,
+  "totalWallTimeMilliseconds": 1642.5481,
   "checkpointVerdict": {
     "checkpoint": "A",
     "precisionThreshold": 0.8,
     "recallThreshold": 0.6,
     "versionAccuracyThreshold": null,
-    "pass": false
+    "pass": true
   },
   "perLibrary": [
     {
       "library": "bzip2",
       "truePositives": 3,
-      "falsePositives": 9,
+      "falsePositives": 0,
       "falseNegatives": 0,
-      "precision": 0.25,
+      "precision": 1,
       "recall": 1
     },
     {
@@ -31,7 +31,23 @@
       "recall": 1
     },
     {
+      "library": "inih",
+      "truePositives": 3,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "precision": 1,
+      "recall": 1
+    },
+    {
       "library": "libpng",
+      "truePositives": 3,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "precision": 1,
+      "recall": 1
+    },
+    {
+      "library": "linenoise",
       "truePositives": 3,
       "falsePositives": 0,
       "falseNegatives": 0,
@@ -47,12 +63,28 @@
       "recall": 0
     },
     {
+      "library": "utf8proc",
+      "truePositives": 3,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "precision": 1,
+      "recall": 1
+    },
+    {
       "library": "zlib",
       "truePositives": 6,
       "falsePositives": 0,
       "falseNegatives": 0,
       "precision": 1,
       "recall": 1
+    },
+    {
+      "library": "zstd",
+      "truePositives": 0,
+      "falsePositives": 0,
+      "falseNegatives": 6,
+      "precision": 0,
+      "recall": 0
     }
   ],
   "perBinary": [
@@ -64,7 +96,7 @@
       "predictedLibraries": [
         "bzip2"
       ],
-      "elapsedMilliseconds": 114.3656,
+      "elapsedMilliseconds": 103.7088,
       "error": null
     },
     {
@@ -75,7 +107,7 @@
       "predictedLibraries": [
         "bzip2"
       ],
-      "elapsedMilliseconds": 15.6512,
+      "elapsedMilliseconds": 38.4497,
       "error": null
     },
     {
@@ -86,7 +118,7 @@
       "predictedLibraries": [
         "bzip2"
       ],
-      "elapsedMilliseconds": 12.2829,
+      "elapsedMilliseconds": 12.2796,
       "error": null
     },
     {
@@ -97,7 +129,7 @@
       "predictedLibraries": [
         "cJSON"
       ],
-      "elapsedMilliseconds": 32.892,
+      "elapsedMilliseconds": 14.6487,
       "error": null
     },
     {
@@ -108,7 +140,7 @@
       "predictedLibraries": [
         "cJSON"
       ],
-      "elapsedMilliseconds": 8.9674,
+      "elapsedMilliseconds": 15.4138,
       "error": null
     },
     {
@@ -119,7 +151,7 @@
       "predictedLibraries": [
         "cJSON"
       ],
-      "elapsedMilliseconds": 7.8331,
+      "elapsedMilliseconds": 11.8698,
       "error": null
     },
     {
@@ -130,7 +162,7 @@
       "predictedLibraries": [
         "cJSON"
       ],
-      "elapsedMilliseconds": 9.1534,
+      "elapsedMilliseconds": 16.9247,
       "error": null
     },
     {
@@ -141,7 +173,7 @@
       "predictedLibraries": [
         "cJSON"
       ],
-      "elapsedMilliseconds": 7.5792,
+      "elapsedMilliseconds": 9.6362,
       "error": null
     },
     {
@@ -152,7 +184,40 @@
       "predictedLibraries": [
         "cJSON"
       ],
-      "elapsedMilliseconds": 16.2844,
+      "elapsedMilliseconds": 19.861,
+      "error": null
+    },
+    {
+      "fileName": "inih-r58-clang-O2.so",
+      "expectedLibraries": [
+        "inih"
+      ],
+      "predictedLibraries": [
+        "inih"
+      ],
+      "elapsedMilliseconds": 3.7719,
+      "error": null
+    },
+    {
+      "fileName": "inih-r58-clang-O3.so",
+      "expectedLibraries": [
+        "inih"
+      ],
+      "predictedLibraries": [
+        "inih"
+      ],
+      "elapsedMilliseconds": 8.1215,
+      "error": null
+    },
+    {
+      "fileName": "inih-r58-clang-Os.so",
+      "expectedLibraries": [
+        "inih"
+      ],
+      "predictedLibraries": [
+        "inih"
+      ],
+      "elapsedMilliseconds": 4.1637,
       "error": null
     },
     {
@@ -161,10 +226,9 @@
         "libpng"
       ],
       "predictedLibraries": [
-        "bzip2",
         "libpng"
       ],
-      "elapsedMilliseconds": 46.2644,
+      "elapsedMilliseconds": 61.4188,
       "error": null
     },
     {
@@ -173,10 +237,9 @@
         "libpng"
       ],
       "predictedLibraries": [
-        "bzip2",
         "libpng"
       ],
-      "elapsedMilliseconds": 40.8525,
+      "elapsedMilliseconds": 49.2799,
       "error": null
     },
     {
@@ -185,10 +248,42 @@
         "libpng"
       ],
       "predictedLibraries": [
-        "bzip2",
         "libpng"
       ],
-      "elapsedMilliseconds": 42.8624,
+      "elapsedMilliseconds": 50.0001,
+      "error": null
+    },
+    {
+      "fileName": "linenoise-1.0-clang-O2.so",
+      "expectedLibraries": [
+        "linenoise"
+      ],
+      "predictedLibraries": [
+        "linenoise"
+      ],
+      "elapsedMilliseconds": 8.2565,
+      "error": null
+    },
+    {
+      "fileName": "linenoise-1.0-clang-O3.so",
+      "expectedLibraries": [
+        "linenoise"
+      ],
+      "predictedLibraries": [
+        "linenoise"
+      ],
+      "elapsedMilliseconds": 4.9871,
+      "error": null
+    },
+    {
+      "fileName": "linenoise-1.0-clang-Os.so",
+      "expectedLibraries": [
+        "linenoise"
+      ],
+      "predictedLibraries": [
+        "linenoise"
+      ],
+      "elapsedMilliseconds": 9.8002,
       "error": null
     },
     {
@@ -196,10 +291,8 @@
       "expectedLibraries": [
         "lz4"
       ],
-      "predictedLibraries": [
-        "bzip2"
-      ],
-      "elapsedMilliseconds": 43.0413,
+      "predictedLibraries": [],
+      "elapsedMilliseconds": 51.2234,
       "error": null
     },
     {
@@ -207,10 +300,8 @@
       "expectedLibraries": [
         "lz4"
       ],
-      "predictedLibraries": [
-        "bzip2"
-      ],
-      "elapsedMilliseconds": 33.5948,
+      "predictedLibraries": [],
+      "elapsedMilliseconds": 47.7718,
       "error": null
     },
     {
@@ -218,10 +309,8 @@
       "expectedLibraries": [
         "lz4"
       ],
-      "predictedLibraries": [
-        "bzip2"
-      ],
-      "elapsedMilliseconds": 25.5102,
+      "predictedLibraries": [],
+      "elapsedMilliseconds": 42.0136,
       "error": null
     },
     {
@@ -229,10 +318,8 @@
       "expectedLibraries": [
         "lz4"
       ],
-      "predictedLibraries": [
-        "bzip2"
-      ],
-      "elapsedMilliseconds": 30.9532,
+      "predictedLibraries": [],
+      "elapsedMilliseconds": 40.6743,
       "error": null
     },
     {
@@ -240,10 +327,8 @@
       "expectedLibraries": [
         "lz4"
       ],
-      "predictedLibraries": [
-        "bzip2"
-      ],
-      "elapsedMilliseconds": 31.9109,
+      "predictedLibraries": [],
+      "elapsedMilliseconds": 69.0531,
       "error": null
     },
     {
@@ -251,10 +336,41 @@
       "expectedLibraries": [
         "lz4"
       ],
-      "predictedLibraries": [
-        "bzip2"
+      "predictedLibraries": [],
+      "elapsedMilliseconds": 45.2595,
+      "error": null
+    },
+    {
+      "fileName": "utf8proc-2.9.0-clang-O2.so",
+      "expectedLibraries": [
+        "utf8proc"
       ],
-      "elapsedMilliseconds": 24.0167,
+      "predictedLibraries": [
+        "utf8proc"
+      ],
+      "elapsedMilliseconds": 13.4394,
+      "error": null
+    },
+    {
+      "fileName": "utf8proc-2.9.0-clang-O3.so",
+      "expectedLibraries": [
+        "utf8proc"
+      ],
+      "predictedLibraries": [
+        "utf8proc"
+      ],
+      "elapsedMilliseconds": 28.4868,
+      "error": null
+    },
+    {
+      "fileName": "utf8proc-2.9.0-clang-Os.so",
+      "expectedLibraries": [
+        "utf8proc"
+      ],
+      "predictedLibraries": [
+        "utf8proc"
+      ],
+      "elapsedMilliseconds": 13.2208,
       "error": null
     },
     {
@@ -265,7 +381,7 @@
       "predictedLibraries": [
         "zlib"
       ],
-      "elapsedMilliseconds": 14.3851,
+      "elapsedMilliseconds": 27.1483,
       "error": null
     },
     {
@@ -276,7 +392,7 @@
       "predictedLibraries": [
         "zlib"
       ],
-      "elapsedMilliseconds": 16.1883,
+      "elapsedMilliseconds": 36.2421,
       "error": null
     },
     {
@@ -287,7 +403,7 @@
       "predictedLibraries": [
         "zlib"
       ],
-      "elapsedMilliseconds": 14.1315,
+      "elapsedMilliseconds": 20.014,
       "error": null
     },
     {
@@ -298,7 +414,7 @@
       "predictedLibraries": [
         "zlib"
       ],
-      "elapsedMilliseconds": 30.1439,
+      "elapsedMilliseconds": 22.1705,
       "error": null
     },
     {
@@ -309,7 +425,7 @@
       "predictedLibraries": [
         "zlib"
       ],
-      "elapsedMilliseconds": 13.3047,
+      "elapsedMilliseconds": 34.9751,
       "error": null
     },
     {
@@ -320,7 +436,61 @@
       "predictedLibraries": [
         "zlib"
       ],
-      "elapsedMilliseconds": 13.3274,
+      "elapsedMilliseconds": 18.8378,
+      "error": null
+    },
+    {
+      "fileName": "zstd-1.5.5-clang-O2.so",
+      "expectedLibraries": [
+        "zstd"
+      ],
+      "predictedLibraries": [],
+      "elapsedMilliseconds": 126.4543,
+      "error": null
+    },
+    {
+      "fileName": "zstd-1.5.5-clang-O3.so",
+      "expectedLibraries": [
+        "zstd"
+      ],
+      "predictedLibraries": [],
+      "elapsedMilliseconds": 128.8581,
+      "error": null
+    },
+    {
+      "fileName": "zstd-1.5.5-clang-Os.so",
+      "expectedLibraries": [
+        "zstd"
+      ],
+      "predictedLibraries": [],
+      "elapsedMilliseconds": 100.2979,
+      "error": null
+    },
+    {
+      "fileName": "zstd-1.5.6-clang-O2.so",
+      "expectedLibraries": [
+        "zstd"
+      ],
+      "predictedLibraries": [],
+      "elapsedMilliseconds": 124.8341,
+      "error": null
+    },
+    {
+      "fileName": "zstd-1.5.6-clang-O3.so",
+      "expectedLibraries": [
+        "zstd"
+      ],
+      "predictedLibraries": [],
+      "elapsedMilliseconds": 118.9474,
+      "error": null
+    },
+    {
+      "fileName": "zstd-1.5.6-clang-Os.so",
+      "expectedLibraries": [
+        "zstd"
+      ],
+      "predictedLibraries": [],
+      "elapsedMilliseconds": 90.0338,
       "error": null
     }
   ]

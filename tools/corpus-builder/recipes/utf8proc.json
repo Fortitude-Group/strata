@@ -1,0 +1,9 @@
+{
+  "name": "utf8proc",
+  "purl": "pkg:generic/utf8proc",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/JuliaStrings/utf8proc",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "2.9.0", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

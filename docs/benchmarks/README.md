@@ -34,33 +34,43 @@ the exact version every time — clearing Checkpoint A on real cross-compiler bi
 
 ## Checkpoint A — multi-library, real cross-compiler (2026-08-20)
 
-**Setup.** Corpus built from **gcc `-O2/-O3/-Os`** across 5 real libraries — **zlib, libpng, cJSON, lz4,
-bzip2** (8 library-versions, 24 binaries; 3050 function + 3866 string signatures). Held-out set: the
-same libraries compiled with **clang `-O2/-O3/-Os` and stripped** (24 binaries) — a genuinely different
-compiler. Identification threshold 0.25.
+**Setup.** Corpus built from **gcc `-O2/-O3/-Os`** across **9 real libraries** — zlib, libpng, cJSON,
+lz4, bzip2, zstd, inih, linenoise, utf8proc (13 library-versions, 39 binaries; 6030 function + 7240
+string signatures). Held-out set: the same libraries compiled with **clang `-O2/-O3/-Os`, stripped**
+(39 binaries) — a genuinely different compiler. Identification threshold 0.3.
 
 | Library | Precision | Recall | Verdict |
 |---------|-----------|--------|---------|
 | zlib | **100%** | **100%** | ✅ |
 | libpng | **100%** | **100%** | ✅ |
 | cJSON | **100%** | **100%** | ✅ |
-| bzip2 | 25% | 100% | ⚠️ over-reports |
+| inih | **100%** | **100%** | ✅ |
+| linenoise | **100%** | **100%** | ✅ |
+| utf8proc | **100%** | **100%** | ✅ |
+| bzip2 | 21% | 100% | ⚠️ over-reports |
 | lz4 | 0% | 0% | ⚠️ missed |
-| **aggregate** | 66.7% | 75.0% | Checkpoint A gate (≥80%/≥60%) **not met on precision** |
+| zstd | 0% | 0% | ⚠️ missed |
+| **aggregate** | 71.1% | 69.2% | Checkpoint A gate (≥80%/≥60%) **not met on precision** |
 
-Version-resolution accuracy across matched libraries: **100%**. Full report:
+Version-resolution accuracy across matched libraries: **88.9%**. Full report:
 [`checkpoint-a-multi-library.json`](checkpoint-a-multi-library.json).
 
-**Honest reading.** Three of five libraries identify perfectly cross-compiler. The two failures are the
-smallest, structurally-similar **compression** libraries: **bzip2 over-reports** (its low-level
-bit/buffer functions match near-identically — ≥0.82 similarity — against lz4/libpng targets), and
-**lz4 is missed** (it is string-rich, so coverage-ratio confidence dilutes below threshold). The root
-cause is measured, not guessed: with only 5 libraries, per-signature **distinctiveness cannot tell a
-genuinely-unique function from generic compression code**, because the corpus lacks the counter-examples
-that would down-weight it. This is a corpus-size limitation, not an algorithm dead-end — the fix is the
-production **~50-library corpus** (more libraries ⇒ shared code correctly loses distinctiveness) plus a
-working Checkpoint-B embedding. We publish this rather than cherry-pick the three clean libraries:
-honesty over coverage is the point.
+**Honest reading.** **Six of nine libraries identify perfectly cross-compiler** — including three added
+after the initial run (inih, linenoise, utf8proc), which worked first-try. All three failures are the
+**compression family** (bzip2, lz4, zstd): they share so much near-identical low-level bit/buffer code
+that, at the instruction level, their functions genuinely match each other (MinHash ≥0.75 — verified,
+not assumed; it is not a coarse CFG-hash artefact). bzip2 (small, generic) over-reports; lz4/zstd
+(string-poor, tight loops) fall below threshold. The root cause is **measured**: distinguishing
+genuinely-unique compression functions from generic compression code needs many *compression* libraries
+in the corpus so the shared code loses distinctiveness — the production ~50-library corpus, plus a
+working Checkpoint-B embedding. We publish this — including the failures — rather than cherry-pick the
+six clean libraries: honesty over coverage is the entire point of the tool.
+
+**Diagnosis journey (all measured, per Principle XI).** The first cross-library run was 20% precision;
+each fix was driven by reading the actual evidence: excluded CRT/linker stubs and metadata strings
+(section names, `GLIBC_*`), switched to IDF distinctiveness, added an 8-instruction minimum-function
+gate, moved to an optimized-only corpus, and demoted CFG-shape agreement from a match-maker to a nudge.
+Absolute-mass confidence saturation was tried and **reverted** (measured: it dropped precision to 31%).
 
 **Quality improvements this run** (all principled, all kept): exclude CRT/linker stubs and
 compiler-runtime functions from the corpus; **IDF-style distinctiveness** (ubiquitous signatures → ~0);

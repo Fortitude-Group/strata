@@ -1,0 +1,9 @@
+{
+  "name": "parson",
+  "purl": "pkg:generic/parson",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/kgabis/parson",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.5.3", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

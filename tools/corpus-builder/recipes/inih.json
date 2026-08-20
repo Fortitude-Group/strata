@@ -1,0 +1,9 @@
+{
+  "name": "inih",
+  "purl": "pkg:generic/inih",
+  "knownLicense": "BSD-3-Clause",
+  "sourceUrl": "https://github.com/benhoyt/inih",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "r58", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

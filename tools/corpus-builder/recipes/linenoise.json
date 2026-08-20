@@ -1,0 +1,9 @@
+{
+  "name": "linenoise",
+  "purl": "pkg:generic/linenoise",
+  "knownLicense": "BSD-2-Clause",
+  "sourceUrl": "https://github.com/antirez/linenoise",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.0", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}
