@@ -36,7 +36,10 @@ public static class ScanCommand
                 ModelPath = args.Get("model"),
             };
 
-            var scanner = new StrataScanner();
+            var log = args.Has("verbose")
+                ? new Strata.Core.Diagnostics.StructuredLog(stderr)
+                : Strata.Core.Diagnostics.StructuredLog.Null;
+            var scanner = new StrataScanner(log: log);
             ScanResult result;
             using (FileStream fs = File.OpenRead(binaryPath))
             {

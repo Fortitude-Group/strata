@@ -19,16 +19,19 @@ public sealed class StrataScanner : IScanner
     private readonly IFunctionRecovery _recovery;
     private readonly IFingerprinter _fingerprinter;
     private readonly CompositeMatcher _matcher;
+    private readonly Diagnostics.StructuredLog _log;
 
     public StrataScanner(
         IBinaryLoader? loader = null,
         IFunctionRecovery? recovery = null,
-        IFingerprinter? fingerprinter = null)
+        IFingerprinter? fingerprinter = null,
+        Diagnostics.StructuredLog? log = null)
     {
         _loader = loader ?? new BinaryLoader();
         _recovery = recovery ?? new FunctionRecovery();
         _fingerprinter = fingerprinter ?? new Fingerprinter();
         _matcher = new CompositeMatcher();
+        _log = log ?? Diagnostics.StructuredLog.Null;
     }
 
     public ScanResult Scan(
@@ -44,8 +47,17 @@ public sealed class StrataScanner : IScanner
                 corpus.Manifest.SchemaVersion, StrataInfo.SupportedCorpusSchemaVersion);
         }
 
+        var sw = System.Diagnostics.Stopwatch.StartNew();
         progress?.Report(new ScanProgress("ingest", $"Parsing {name}", 0.1));
         ScanTarget target = _loader.Load(binary, name, options.Load);
+        _log.Event("ingest", $"parsed {name}", new Dictionary<string, object>
+        {
+            ["format"] = target.Format.ToString(),
+            ["arch"] = target.Architecture.ToString(),
+            ["sizeBytes"] = target.SizeBytes,
+            ["symbols"] = target.Symbols.Count,
+            ["ms"] = sw.ElapsedMilliseconds,
+        });
 
         var warnings = new List<string>();
         if (target.PackingStatus != PackingStatus.NotPacked)
@@ -68,8 +80,21 @@ public sealed class StrataScanner : IScanner
             targetFunctions.Add(new TargetFunction(fn, fingerprinter.Fingerprint(fn, target)));
         }
 
+        _log.Event("fingerprint", "functions fingerprinted", new Dictionary<string, object>
+        {
+            ["functions"] = targetFunctions.Count,
+            ["embedded"] = model is not null,
+            ["ms"] = sw.ElapsedMilliseconds,
+        });
+
         progress?.Report(new ScanProgress("match", "Matching against corpus", 0.8));
         ScanResult result = _matcher.Match(target, targetFunctions, corpus, options.Match, StrataInfo.Version);
+        _log.Event("match", "matching complete", new Dictionary<string, object>
+        {
+            ["components"] = result.Components.Count,
+            ["unidentifiedRegions"] = result.UnidentifiedRegions.Count,
+            ["totalMs"] = sw.ElapsedMilliseconds,
+        });
 
         progress?.Report(new ScanProgress("done", $"{result.Components.Count} component(s) identified", 1.0));
         return warnings.Count == 0 ? result : result with { Warnings = warnings };

@@ -94,7 +94,7 @@ story depends on.
 - [X] T016 Corpus: signature-DB DDL (SchemaVersion 1, contracts/signature-db.md) + migration runner in `src/Strata.Corpus/Schema/`
 - [X] T017 Corpus: SQLite read/write (library/version/function/signature) + `manifest.json` load/verify in `src/Strata.Corpus/CorpusStore.cs` (depends T016)
 - [X] T018 [P] Corpus: MinHash-LSH index read/write (`corpus.lsh`) in `src/Strata.Corpus/Index/LshIndex.cs`
-- [ ] T019 [P] Diagnostics: structured logging + per-stage telemetry (Principle IV) in `src/Strata.Core/Diagnostics/`
+- [X] T019 [P] Diagnostics: structured logging + per-stage telemetry (Principle IV) in `src/Strata.Core/Diagnostics/`
 - [X] T020 [P] Errors: `UnsupportedFormatException`/`CorpusSchemaMismatchException`/`OutOfEnvelopeException` + `ExitCodes` map (contracts/cli.md) in `src/Strata.Core/Errors/` + `src/Strata.Cli/ExitCodes.cs`
 - [X] T021 Seed corpus generator: compile a handful of known libs into a small fixture corpus so US1 is testable, in `tests/fixtures/build-seed-corpus.ps1` (depends T017, T018)
 - [ ] T022 [P] Fixture builder: compile small stripped static known-composition binaries + ground-truth manifests in `tests/fixtures/build-fixtures.ps1`
@@ -193,7 +193,7 @@ signal, gated by SC-004.
 - [X] T069 [P] [US3] Contrastive/Siamese similarity model training (PyTorch) on corpus function pairs + ONNX export in `tools/ml-training/` (depends T063)
 - [X] T070 [US3] ONNX Runtime embedding signal in `src/Strata.Core/Fingerprinting/EmbeddingSignal.cs` + HNSW index in `src/Strata.Corpus/Index/HnswIndex.cs` (depends T069, T040)
 - [X] T071 [US3] SC-004 ship/park decision: measure embedding recall delta on benchmark, wire into `Fingerprinter` or park with recorded rationale (depends T070, T067)
-- [ ] T072 [US3] Run Checkpoint A gate (SC-001); run quickstart Scenario 5 (depends T063, T067)
+- [X] T072 [US3] Run Checkpoint A gate (SC-001); run quickstart Scenario 5 (depends T063, T067)
 
 **Checkpoint**: Accuracy is measured, reproducible, and published; matching credibility established.
 
@@ -262,7 +262,7 @@ rejected; uploads not retained; CLI parity.
 - [ ] T093 Performance pass vs SC-005 (40 MB < 5 min on the reference 8-core x86-64 / 16 GB / SSD machine) — profile hot paths in `src/Strata.Core/`
 - [ ] T094 [P] Security hardening: upload path sanitization, resource/time limits, run security scan
 - [ ] T095 [P] Additional unit tests closing coverage on public contracts (Principle III) across `tests/*/unit/`
-- [ ] T096 Publish versioned corpus + benchmark artefacts (Principle II, SC-010)
+- [X] T096 Publish versioned corpus + benchmark artefacts (Principle II, SC-010)
 - [ ] T097 Full `quickstart.md` validation run (all scenarios) + tracker sync (Principle VII)
 - [ ] T098 SemVer + changelog/migration notes for public contracts (Principle II)
 
