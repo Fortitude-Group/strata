@@ -128,7 +128,7 @@ inputs handled.
 - [X] T031 [P] [US1] Format detection + packing/obfuscation detection in `src/Strata.Core/Ingestion/FormatDetector.cs` + `PackingDetector.cs`
 - [X] T032 [US1] `IBinaryLoader` implementation composing readers in `src/Strata.Core/Ingestion/BinaryLoader.cs` (depends T029–T031)
 - [X] T033 [P] [US1] Iced x86-64 disassembly adapter in `src/Strata.Core/Disassembly/IcedAdapter.cs`
-- [ ] T034 [P] [US1] Capstone AArch64 disassembly adapter in `src/Strata.Core/Disassembly/CapstoneAdapter.cs`
+- [X] T034 [P] [US1] Capstone AArch64 disassembly adapter in `src/Strata.Core/Disassembly/CapstoneAdapter.cs`
 - [X] T035 [US1] Function-boundary recovery (symbol/call-target/prologue/linear-sweep + confidence) in `src/Strata.Core/Recovery/FunctionRecovery.cs` (depends T032, T033, T034)
 - [X] T036 [US1] CFG/basic-block construction in `src/Strata.Core/Recovery/CfgBuilder.cs` (depends T035)
 - [X] T037 [P] [US1] String/constant reference signal in `src/Strata.Core/Fingerprinting/StringConstantSignal.cs`
@@ -162,10 +162,10 @@ containing range where it does not.
 
 - [X] T053 [P] [US2] Integration test: exact vs range on zlib version fixtures in `tests/integration/VersionResolutionTests.cs`
 - [X] T054 [US2] Present/absent function-set diffing across corpus versions in `src/Strata.Core/Versioning/FunctionSetDiff.cs`
-- [ ] T055 [P] [US2] Version-specific string/constant evidence in `src/Strata.Core/Versioning/VersionStringEvidence.cs`
+- [X] T055 [P] [US2] Version-specific string/constant evidence in `src/Strata.Core/Versioning/VersionStringEvidence.cs`
 - [X] T056 [US2] Range bounding + precision invariant + `versionBasis` in `src/Strata.Core/Versioning/VersionResolver.cs` (depends T054, T055)
 - [X] T057 [US2] Wire resolver into `Matcher` + SBOM version/range emission in `src/Strata.Core/Matching/Matcher.cs` + `src/Strata.Sbom/` (depends T056, T043, T045, T046)
-- [ ] T058 [US2] Make T053 green; run quickstart Scenario 2 (depends T057)
+- [X] T058 [US2] Make T053 green; run quickstart Scenario 2 (depends T057)
 
 **Checkpoint**: US1 + US2 both work independently.
 

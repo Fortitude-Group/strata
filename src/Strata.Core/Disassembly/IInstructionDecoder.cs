@@ -20,6 +20,7 @@ public static class DecoderFactory
     public static IInstructionDecoder? For(Architecture architecture) => architecture switch
     {
         Architecture.X86_64 => new IcedX64Decoder(),
-        _ => null, // AArch64 (Capstone) lands with T034; others are out of scope.
+        Architecture.AArch64 => new CapstoneArm64Decoder(),
+        _ => null, // other architectures are out of scope.
     };
 }
