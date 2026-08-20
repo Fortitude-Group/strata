@@ -1,11 +1,11 @@
-# Strata — Binary-to-SBOM
+# Strata: Binary-to-SBOM
 
 **Strata reads the layers in software you didn't build.** Give it a compiled, stripped, possibly
-statically-linked native binary — no source, no debug info — and it produces a **CycloneDX / SPDX SBOM
+statically-linked native binary, with no source and no debug info, and it produces a **CycloneDX / SPDX SBOM
 of the open-source libraries and versions compiled into it**, each with a **confidence score** and the
 **evidence** behind it.
 
-> Strata produces *evidence toward* an SBOM. It does **not** certify or confer CRA compliance —
+> Strata produces *evidence toward* an SBOM. It does **not** certify or confer CRA compliance:
 > compliance is the user's responsibility. Every reported component carries its evidence and a
 > confidence; code it cannot place is reported as *unidentified*, never guessed.
 
@@ -33,7 +33,7 @@ ingest ─▶ recover functions ─▶ fingerprint ─▶ match corpus ─▶ SB
 - **Multi-signal, cheapest-first.** String/constant references, a register-allocation-robust CFG-shape
   hash, and a normalised-instruction MinHash. Signals fail independently, so their agreement is meaningful.
 - **Honest versions.** Versions resolve to an exact value where the evidence is unambiguous, otherwise a
-  bounded range (the intersection of the present functions' version ranges) — never more precise than the
+  bounded range (the intersection of the present functions' version ranges), never more precise than the
   evidence supports.
 - **Deterministic.** The same binary + corpus yields byte-identical output (`--deterministic`).
 - **Thin CVE cross-reference.** Identified `library@version` pairs are mapped to known CVEs from a pinned
@@ -78,7 +78,7 @@ image**; a **GitHub Action** (`action.yml`) wraps it for CI.
 R&D build under active development. The x86-64 engine, all three container formats (ELF/PE/Mach-O
 ingestion), the string + function signals, SBOM output, CVE cross-reference, the web demo, the corpus
 builder, and the benchmark harness are implemented and tested. AArch64 decoding, the learned embedding
-signal, and a production-scale reference corpus are in progress — tracked in
+signal, and a production-scale reference corpus are in progress, tracked in
 [`specs/001-strata-binary-sbom/tasks.md`](specs/001-strata-binary-sbom/tasks.md).
 
 Benchmarks (precision/recall/version accuracy) are published good or bad, per the project's technical

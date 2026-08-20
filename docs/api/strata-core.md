@@ -1,7 +1,7 @@
 # `Strata.Core` API reference
 
 `Strata.Core` is the engine assembly: ingestion → function recovery → fingerprinting → matching →
-`ScanResult`. It is the **one** implementation of the pipeline — the CLI, the web demo, the corpus
+`ScanResult`. It is the **one** implementation of the pipeline: the CLI, the web demo, the corpus
 builder, and the benchmark harness all consume it directly (Principle I, "one engine"). This document
 covers the public surface: what each type is for, its key members, and the invariants it upholds.
 Namespaces: `Strata.Core`, `Strata.Core.Model`, `Strata.Core.Corpus`, `Strata.Core.Ingestion`,
@@ -23,7 +23,7 @@ public interface IScanner
 
 `StrataScanner` (`Strata.Core.StrataScanner`) is the default, and normally only, implementation. It
 composes `IBinaryLoader → IFunctionRecovery → IFingerprinter → CompositeMatcher` and streams five
-progress events (`ingest`, `recover`, `fingerprint`, `match`, `done`) via `IProgress<ScanProgress>` —
+progress events (`ingest`, `recover`, `fingerprint`, `match`, `done`) via `IProgress<ScanProgress>`,
 purely for UX (e.g. the web demo's "libraries light up" reveal); progress never affects the result.
 
 ```csharp
@@ -37,7 +37,7 @@ public StrataScanner(
 All four dependencies default to the first-party implementation (`BinaryLoader`, `FunctionRecovery`,
 `Fingerprinter`, `StructuredLog.Null`), so `new StrataScanner()` is a complete, working scanner. The
 constructor arguments exist for test seams and for swapping in a learned-embedding-aware
-`Fingerprinter` — which `Scan` itself does per-call, loading `options.ModelPath` via
+`Fingerprinter`, which `Scan` itself does per-call, loading `options.ModelPath` via
 `Fingerprinting.EmbeddingModel.TryLoad` and falling back to the injected default fingerprinter when no
 model is present or loadable.
 
@@ -45,7 +45,7 @@ model is present or loadable.
 - **Determinism** (Principle IV): `Scan` is a pure function of `(binary bytes, corpus, options)`. No
   wall-clock time, RNG, or machine-specific state enters `ScanResult`.
 - **Corpus schema gate**: throws `CorpusSchemaMismatchException` up front if
-  `corpus.Manifest.SchemaVersion != StrataInfo.SupportedCorpusSchemaVersion` — before any parsing work.
+  `corpus.Manifest.SchemaVersion != StrataInfo.SupportedCorpusSchemaVersion`, before any parsing work.
 - **Packing is flagged, never unpacked**: if `target.PackingStatus != PackingStatus.NotPacked`, a
   warning is appended to `ScanResult.Warnings`; the scan still runs (Strata does not unpack).
 - **Graceful degrade**: when the architecture has no instruction decoder (function recovery yields no
@@ -53,7 +53,7 @@ model is present or loadable.
 
 ## Options
 
-All under `Strata.Core`, all immutable `record`s with sensible defaults — `new ScanOptions()` is a
+All under `Strata.Core`, all immutable `record`s with sensible defaults: `new ScanOptions()` is a
 valid, working configuration.
 
 ```csharp
@@ -90,10 +90,10 @@ Notes:
 - `RecoveryOptions.Plugin` is a declared seam for an optional Ghidra/radare2 depth plug-in
   (research.md R4); as of this build only `None` (the first-party linear-sweep recovery) is wired.
 - `MatchOptions.MinConfidence` is advisory to callers/report renderers (e.g. the CLI's text report
-  greys out below-threshold components) — the engine does not itself drop low-confidence components;
+  greys out below-threshold components), though the engine does not itself drop low-confidence components;
   see FR-015 (honesty invariant) in the spec.
 
-## Ingestion — `IBinaryLoader`
+## Ingestion: `IBinaryLoader`
 
 ```csharp
 public interface IBinaryLoader
@@ -106,11 +106,11 @@ public interface IBinaryLoader
   "refuse to guess" rather than fabricate a result), and `OutOfEnvelopeException` when the stream
   exceeds `LoadOptions.MaxInputBytes`.
 - Default implementation `BinaryLoader` composes `FormatDetector` (magic-byte sniffing) with a
-  per-format reader (`ElfReader`, `PeReader`, `MachOReader` — all tolerant/best-effort: a malformed
+  per-format reader (`ElfReader`, `PeReader`, `MachOReader`, all tolerant/best-effort: a malformed
   section table degrades to header-only facts instead of failing the whole scan), plus
   `StringConstantExtractor` (whole-file printable-ASCII scan) and `PackingDetector` (known packer
   signatures + Shannon entropy ≥ 7.5 ⇒ `PackingStatus.Suspected`).
-- Produces a `ScanTarget` — see below.
+- Produces a `ScanTarget`, see below.
 
 ## `ScanTarget` (`Strata.Core.Model`)
 
@@ -134,9 +134,9 @@ public sealed record ScanTarget
 }
 ```
 
-`Image` is JSON-ignored deliberately — reports and telemetry must never embed the whole binary.
+`Image` is JSON-ignored deliberately: reports and telemetry must never embed the whole binary.
 
-## Function recovery — `IFunctionRecovery`
+## Function recovery: `IFunctionRecovery`
 
 ```csharp
 public interface IFunctionRecovery
@@ -146,7 +146,7 @@ public interface IFunctionRecovery
 ```
 
 Default implementation `FunctionRecovery` (`Strata.Core.Recovery`) does a linear-sweep decode of each
-executable section (via `Disassembly.IInstructionDecoder` — Iced for x86-64, Capstone for AArch64) and
+executable section (via `Disassembly.IInstructionDecoder`: Iced for x86-64, Capstone for AArch64) and
 treats symbol addresses (when present) plus call targets as function-entry candidates, then builds each
 function's CFG with `CfgBuilder.Build`. Each `RecoveredFunction` carries a `RecoveryConfidence` (0.6 for
 the linear-sweep fast path; symbol-driven boundaries are higher-confidence).
@@ -166,9 +166,9 @@ public sealed record RecoveredFunction
 ```
 
 `RecoveryOptions` currently has no cap on function/instruction count for a pathologically dense or
-degenerate section — see `docs/security-review.md` §(b) for the concrete risk and recommendation.
+degenerate section; see `docs/security-review.md` §(b) for the concrete risk and recommendation.
 
-## Fingerprinting — `IFingerprinter`
+## Fingerprinting: `IFingerprinter`
 
 ```csharp
 public interface IFingerprinter
@@ -177,7 +177,7 @@ public interface IFingerprinter
 }
 ```
 
-**The same fingerprinting code builds the corpus and fingerprints scan targets** (Principle I) — a
+**The same fingerprinting code builds the corpus and fingerprints scan targets** (Principle I): a
 target function and its corpus counterpart are always compared on identical features. Default
 implementation `Fingerprinter` combines three-and-a-half independent signals, each targeting a
 different invariance so they fail independently:
@@ -193,20 +193,20 @@ public sealed record FunctionSignature
 }
 ```
 
-- **(b) `CfgShapeSignal`** — FNV-1a64 hash of block count, edge count, and the *sorted* in/out-degree
+- **(b) `CfgShapeSignal`**: FNV-1a64 hash of block count, edge count, and the *sorted* in/out-degree
   sequences of the function's CFG. Address- and register-allocation-independent; stable across
   compilers/optimisation levels for the same source.
-- **(c) `NormInsnSignal`** — a 32-permutation `MinHash` (`Strata.Core.Fingerprinting.MinHash`) over
+- **(c) `NormInsnSignal`**: a 32-permutation `MinHash` (`Strata.Core.Fingerprinting.MinHash`) over
   4-gram shingles of normalised mnemonics (operands abstracted). `MinHash.Similarity` estimates
   Jaccard similarity between two signatures for matching.
-- **(d) Embedding** — only populated when an `EmbeddingModel` (ONNX Runtime in-process inference over
+- **(d) Embedding**: only populated when an `EmbeddingModel` (ONNX Runtime in-process inference over
   an `OpcodeHistogram` feature vector) is supplied to the `Fingerprinter` constructor. `null` when the
-  model is absent — the deliberately "parked" state (see CHANGELOG SC-004 decision). A parked model
+  model is absent, the deliberately "parked" state (see CHANGELOG SC-004 decision). A parked model
   never breaks the pipeline; it is simply an absent signal.
-- All signals are **pure functions of the function's bytes + architecture** (Principle IV) — same
+- All signals are **pure functions of the function's bytes + architecture** (Principle IV): same
   input, same fingerprint, forever.
 
-## Matching — `IMatcher` / `CompositeMatcher`
+## Matching: `IMatcher` / `CompositeMatcher`
 
 ```csharp
 public interface IMatcher
@@ -219,15 +219,15 @@ The conceptual contract's `IMatcher` is the string-only MVP surface, still imple
 `Matching.StringEvidenceMatcher`. The scanner instead drives `Matching.CompositeMatcher` (not an
 `IMatcher` itself, but the same shape plus a target-functions parameter), which fuses:
 
-- **String/constant evidence** (`StringEvidenceMatcher`) — confidence = distinctiveness-weighted
+- **String/constant evidence** (`StringEvidenceMatcher`): confidence = distinctiveness-weighted
   coverage of a library's corpus strings that appear verbatim in the target.
-- **Function evidence** (`FunctionEvidenceMatcher`) — for each recovered target function, finds its
+- **Function evidence** (`FunctionEvidenceMatcher`): for each recovered target function, finds its
   best corpus match via `Fingerprinting.LshIndex` (banded MinHash-LSH candidate retrieval, `Bands=8`,
   exact CFG-shape hash as a second recall channel) with a similarity floor of `0.7`; when both sides
   carry an embedding, cosine similarity can also promote a candidate. Per-library **coverage** =
   matched corpus functions ÷ `corpus.FunctionCount(library)`.
 - **Fusion**: when a library has evidence from both signals, confidence combines by **noisy-OR**
-  (`1 - (1-a)(1-b)`) — independent-signal agreement strengthens a claim (Principle XII), never simple
+  (`1 - (1-a)(1-b)`): independent-signal agreement strengthens a claim (Principle XII), never simple
   averaging that could dilute a strong single-signal hit.
 - **Version resolution** for function-only matches delegates to `Versioning.VersionResolver`.
 
@@ -245,7 +245,7 @@ public sealed record ScanResult
 }
 ```
 
-`ScanResult` is a pure function of `(target bytes, corpus version, tool version, vuln snapshot)` —
+`ScanResult` is a pure function of `(target bytes, corpus version, tool version, vuln snapshot)`:
 nondeterministic presentation fields (SBOM serial numbers, timestamps) live in the SBOM output layer,
 never here. `Components` is always ordered by confidence descending, then library name (deterministic
 tie-break).
@@ -273,8 +273,8 @@ public sealed record IdentifiedComponent
 ```
 
 > **Evidence invariant (FR-014, SC-007), enforced in the constructor:** `evidence.Count == 0` throws
-> `ArgumentException`. **A component with no evidence cannot exist as a matter of type construction**
-> — this is the single strongest guarantee in the API: no caller-side check can accidentally skip it.
+> `ArgumentException`. **A component with no evidence cannot exist as a matter of type construction**,
+> this is the single strongest guarantee in the API: no caller-side check can accidentally skip it.
 
 ### `VersionResolution`
 
@@ -301,7 +301,7 @@ public sealed record VersionResolution
 > honesty rule: one exact-version string ⇒ exact; multiple conflicting exact strings ⇒ range spanning
 > them; only range-tagged strings ⇒ their bound intersection; no version evidence at all ⇒ the
 > library's full known window. Versions are ordered numerically by `Util.VersionOrder` (dotted-numeric
-> segments + trailing letter suffix), never as raw strings — `"1.2.11"` correctly sorts after
+> segments + trailing letter suffix), never as raw strings; `"1.2.11"` correctly sorts after
 > `"1.2.9"`.
 
 ### `EvidenceRecord`
@@ -332,7 +332,7 @@ public sealed record UnidentifiedRegion
 ```
 
 > **Honesty invariant (FR-015, SC-008):** every recovered function is covered either by a matched
-> component's evidence, or by an `UnidentifiedRegion` — no silent drops, no forced matches. With
+> component's evidence, or by an `UnidentifiedRegion`: no silent drops, no forced matches. With
 > function recovery available, `CompositeMatcher` reports regions at per-function granularity; when no
 > functions were recovered (e.g. an unsupported architecture), it falls back to the whole-file region
 > the string matcher computes.
@@ -352,9 +352,9 @@ public sealed record VulnerabilityReference
 
 Attached post-scan by `Strata.Vuln.VulnerabilityCrossReference` (a thin OSV/NVD range-aware lookup,
 outside `Strata.Core`) via `IdentifiedComponent.WithVulnerabilities`. Deep triage/reachability is
-explicitly out of scope (FR-019) — identification is the value.
+explicitly out of scope (FR-019): identification is the value.
 
-## Corpus access — `ICorpus`
+## Corpus access: `ICorpus`
 
 ```csharp
 public interface ICorpus
@@ -408,7 +408,7 @@ public sealed record CorpusFunctionSignature
 ```
 
 `SchemaVersion` is checked against `StrataInfo.SupportedCorpusSchemaVersion` (currently `1`) at the top
-of every `Scan` call — a mismatch throws `CorpusSchemaMismatchException` before any binary parsing
+of every `Scan` call: a mismatch throws `CorpusSchemaMismatchException` before any binary parsing
 happens.
 
 ## Errors (`Strata.Core.Errors`)
@@ -427,7 +427,7 @@ public sealed class OutOfEnvelopeException : StrataException { }        // input
 
 All three derive from `StrataException`, so a caller that only needs "did the engine refuse this
 input" can catch the base type; callers that need to branch on *why* (e.g. the CLI mapping to distinct
-exit codes) catch the concrete types. None of these are thrown for a malformed-but-parseable binary —
+exit codes) catch the concrete types. None of these are thrown for a malformed-but-parseable binary:
 readers degrade to header-only/best-effort facts instead (see `docs/security-review.md` §(a)).
 
 ## `StrataInfo`
@@ -442,7 +442,7 @@ public static class StrataInfo
 
 ## Usage: scan a binary in C#
 
-This mirrors exactly what `Strata.Cli.ScanCommand` does — the CLI has no logic beyond argument parsing,
+This mirrors exactly what `Strata.Cli.ScanCommand` does: the CLI has no logic beyond argument parsing,
 report/SBOM emission, and exit-code mapping; everything shown below is real `Strata.Core` API.
 
 ```csharp
@@ -500,5 +500,5 @@ catch (CorpusSchemaMismatchException ex)
 }
 ```
 
-To feed a `ScanResult` into an SBOM, pass it to `Strata.Sbom.SbomWriter.Emit(result, SbomFormat.CycloneDx, options)`
-— outside `Strata.Core`, covered by `specs/001-strata-binary-sbom/contracts/sbom-output.md`.
+To feed a `ScanResult` into an SBOM, pass it to `Strata.Sbom.SbomWriter.Emit(result, SbomFormat.CycloneDx, options)`,
+outside `Strata.Core`, covered by `specs/001-strata-binary-sbom/contracts/sbom-output.md`.
