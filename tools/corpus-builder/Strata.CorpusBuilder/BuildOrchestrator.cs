@@ -237,8 +237,32 @@ public static class BuildOrchestrator
                 g => g.Select(s => s.LibraryName).Distinct(StringComparer.Ordinal).Count(),
                 StringComparer.Ordinal);
 
+        // Reconcile across versions: emit ONE signature per (library, value). A value seen in exactly one
+        // build version is version-specific (exact); a value seen across versions carries the version
+        // RANGE it spans. This is what lets a version banner resolve to an exact version while shared
+        // strings widen honestly — and it dedups the corpus and the evidence surface (Principle XII).
         return sigs
-            .Select(s => s with { Distinctiveness = 1.0 / libraryCountByValue[s.Value] })
+            .GroupBy(s => (s.LibraryName, s.Value))
+            .Select(g =>
+            {
+                List<string> versions = g
+                    .Select(s => s.ExactVersion)
+                    .Where(v => v is not null)
+                    .Select(v => v!)
+                    .Distinct(StringComparer.Ordinal)
+                    .ToList();
+                versions.Sort(Strata.Core.Util.VersionOrder.Compare);
+
+                CorpusStringSignature first = g.First();
+                double distinctiveness = 1.0 / libraryCountByValue[first.Value];
+
+                return versions.Count switch
+                {
+                    1 => first with { Distinctiveness = distinctiveness, ExactVersion = versions[0], VersionLow = null, VersionHigh = null },
+                    > 1 => first with { Distinctiveness = distinctiveness, ExactVersion = null, VersionLow = versions[0], VersionHigh = versions[^1] },
+                    _ => first with { Distinctiveness = distinctiveness },
+                };
+            })
             .OrderBy(s => s.LibraryName, StringComparer.Ordinal)
             .ThenBy(s => s.Value, StringComparer.Ordinal)
             .ToList();
