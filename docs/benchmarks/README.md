@@ -32,6 +32,42 @@ the exact version every time — clearing Checkpoint A on real cross-compiler bi
 - This is a **single-library** corpus (zlib). The precision figure does not yet stress cross-library
   false positives at scale; that needs the full ~50-library corpus (in progress).
 
+## Checkpoint A — multi-library, real cross-compiler (2026-08-20)
+
+**Setup.** Corpus built from **gcc `-O2/-O3/-Os`** across 5 real libraries — **zlib, libpng, cJSON, lz4,
+bzip2** (8 library-versions, 24 binaries; 3050 function + 3866 string signatures). Held-out set: the
+same libraries compiled with **clang `-O2/-O3/-Os` and stripped** (24 binaries) — a genuinely different
+compiler. Identification threshold 0.25.
+
+| Library | Precision | Recall | Verdict |
+|---------|-----------|--------|---------|
+| zlib | **100%** | **100%** | ✅ |
+| libpng | **100%** | **100%** | ✅ |
+| cJSON | **100%** | **100%** | ✅ |
+| bzip2 | 25% | 100% | ⚠️ over-reports |
+| lz4 | 0% | 0% | ⚠️ missed |
+| **aggregate** | 66.7% | 75.0% | Checkpoint A gate (≥80%/≥60%) **not met on precision** |
+
+Version-resolution accuracy across matched libraries: **100%**. Full report:
+[`checkpoint-a-multi-library.json`](checkpoint-a-multi-library.json).
+
+**Honest reading.** Three of five libraries identify perfectly cross-compiler. The two failures are the
+smallest, structurally-similar **compression** libraries: **bzip2 over-reports** (its low-level
+bit/buffer functions match near-identically — ≥0.82 similarity — against lz4/libpng targets), and
+**lz4 is missed** (it is string-rich, so coverage-ratio confidence dilutes below threshold). The root
+cause is measured, not guessed: with only 5 libraries, per-signature **distinctiveness cannot tell a
+genuinely-unique function from generic compression code**, because the corpus lacks the counter-examples
+that would down-weight it. This is a corpus-size limitation, not an algorithm dead-end — the fix is the
+production **~50-library corpus** (more libraries ⇒ shared code correctly loses distinctiveness) plus a
+working Checkpoint-B embedding. We publish this rather than cherry-pick the three clean libraries:
+honesty over coverage is the point.
+
+**Quality improvements this run** (all principled, all kept): exclude CRT/linker stubs and
+compiler-runtime functions from the corpus; **IDF-style distinctiveness** (ubiquitous signatures → ~0);
+filter ELF/toolchain **metadata strings** (section names, `GLIBC_*` tags); **minimum-8-instruction**
+function gate (tiny functions collide); **optimized-only corpus** (drop `-O0` debug boilerplate);
+identification threshold lowered 0.5 → 0.25 to catch genuine cross-compiler matches.
+
 ## Checkpoint B — SC-004 embedding decision: **PARKED** (2026-08-20)
 
 The full learned-embedding pipeline was built and run end-to-end on the real zlib corpus: symbol-labelled

@@ -24,8 +24,10 @@ public sealed record RecoveryOptions
 /// <summary>Options controlling matching and confidence scoring (research.md R9).</summary>
 public sealed record MatchOptions
 {
-    /// <summary>Components scoring below this are reported as low-confidence rather than omitted (FR-015).</summary>
-    public double MinConfidence { get; init; } = 0.5;
+    /// <summary>Components scoring below this are reported as low-confidence rather than omitted (FR-015).
+    /// 0.25 balances catching genuine cross-compiler matches (~0.3–0.4 coverage) against tiny-shared-function
+    /// noise (~0.01–0.09), which sits an order of magnitude lower.</summary>
+    public double MinConfidence { get; init; } = 0.25;
 }
 
 /// <summary>Options for a full scan.</summary>

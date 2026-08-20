@@ -19,6 +19,20 @@ public static class SignatureExtractor
     private static readonly FunctionRecovery Recovery = new();
     private static readonly Fingerprinter Fingerprinter = new();
 
+    // Compiler/linker runtime stubs present in EVERY shared object — not library identity. Excluding
+    // them from the corpus stops every library from "matching" every target's CRT boilerplate (which
+    // otherwise inflates false positives across libraries).
+    private static readonly HashSet<string> CrtFunctions = new(StringComparer.Ordinal)
+    {
+        "_init", "_fini", "_start", "__libc_csu_init", "__libc_csu_fini", "__do_global_dtors_aux",
+        "__do_global_ctors_aux", "frame_dummy", "register_tm_clones", "deregister_tm_clones",
+        "__gmon_start__", "call_weak_fn", "__stack_chk_fail_local", "atexit", "__cxa_finalize",
+        "_dl_relocate_static_pie", "__libc_start_main", "abort",
+    };
+
+    private static bool IsCrtFunction(string name) =>
+        CrtFunctions.Contains(name) || name.StartsWith("__x86.get_pc_thunk", StringComparison.Ordinal);
+
     public sealed record Extracted(
         IReadOnlyList<CorpusStringSignature> Strings,
         IReadOnlyList<CorpusFunctionSignature> Functions,
@@ -40,6 +54,7 @@ public static class SignatureExtractor
 
         List<CorpusStringSignature> stringSigs = target.Strings
             .Select(s => s.Value)
+            .Where(v => !Strata.Core.Ingestion.StringNoise.IsMetadata(v))
             .Distinct(StringComparer.Ordinal)
             .OrderBy(v => v, StringComparer.Ordinal)
             .Select(v => new CorpusStringSignature
@@ -57,10 +72,20 @@ public static class SignatureExtractor
         var functionSigs = new List<CorpusFunctionSignature>(functions.Count);
         foreach (RecoveredFunction fn in functions.OrderBy(f => f.StartAddress))
         {
-            FunctionSignature sig = fingerprinter.Fingerprint(fn, target);
             string name = symbolByAddress.TryGetValue(fn.StartAddress, out string? sym)
                 ? sym
                 : $"{libraryName}+0x{fn.StartAddress:x}";
+            if (sym is not null && IsCrtFunction(sym))
+            {
+                continue; // skip compiler/linker runtime stubs
+            }
+
+            if (fn.Mnemonics.Count < Strata.Core.Matching.FunctionEvidenceMatcher.MinInstructions)
+            {
+                continue; // too small to fingerprint reliably (non-distinctive, collision-prone)
+            }
+
+            FunctionSignature sig = fingerprinter.Fingerprint(fn, target);
             functionSigs.Add(new CorpusFunctionSignature
             {
                 LibraryName = libraryName,

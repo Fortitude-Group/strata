@@ -43,7 +43,10 @@ if (checkpoint is not ("A" or "a" or "B" or "b"))
 
 try
 {
-    BenchmarkReport report = BenchmarkRunner.Run(corpusPath, binariesDir, groundTruthPath, checkpoint, parsed.Get("model"));
+    double minConfidence = double.TryParse(parsed.Get("min-confidence"), System.Globalization.NumberStyles.Float,
+        System.Globalization.CultureInfo.InvariantCulture, out double mc) ? mc : 0.25;
+    BenchmarkReport report = BenchmarkRunner.Run(
+        corpusPath, binariesDir, groundTruthPath, checkpoint, parsed.Get("model"), minConfidence);
 
     Console.Out.WriteLine($"corpus version              : {report.CorpusVersion}");
     Console.Out.WriteLine($"binaries evaluated           : {report.BinaryCount}");

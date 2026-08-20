@@ -232,8 +232,25 @@ public static class BuildOrchestrator
     }
 
     /// <summary>R9: distinctiveness = inverse cross-library frequency of this exact string value.</summary>
+    /// <summary>
+    /// IDF-style distinctiveness: a signature appearing in every corpus library carries no identifying
+    /// power (→ small floor), one unique to a single library carries full weight. Drives ubiquitous
+    /// cross-library code (CRT stubs, generic helpers) toward zero far more aggressively than 1/freq.
+    /// </summary>
+    private static double Idf(int freq, int totalLibraries)
+    {
+        if (totalLibraries <= 1)
+        {
+            return 1.0;
+        }
+
+        double idf = System.Math.Log((double)totalLibraries / System.Math.Max(1, freq)) / System.Math.Log(totalLibraries);
+        return System.Math.Clamp(idf, 0.02, 1.0);
+    }
+
     private static List<CorpusStringSignature> ApplyStringDistinctiveness(List<CorpusStringSignature> sigs)
     {
+        int totalLibraries = sigs.Select(s => s.LibraryName).Distinct(StringComparer.Ordinal).Count();
         Dictionary<string, int> libraryCountByValue = sigs
             .GroupBy(s => s.Value, StringComparer.Ordinal)
             .ToDictionary(
@@ -258,7 +275,7 @@ public static class BuildOrchestrator
                 versions.Sort(Strata.Core.Util.VersionOrder.Compare);
 
                 CorpusStringSignature first = g.First();
-                double distinctiveness = 1.0 / libraryCountByValue[first.Value];
+                double distinctiveness = Idf(libraryCountByValue[first.Value], totalLibraries);
 
                 return versions.Count switch
                 {
@@ -275,6 +292,7 @@ public static class BuildOrchestrator
     /// <summary>R9: distinctiveness = inverse cross-library frequency of this CFG-shape hash.</summary>
     private static List<CorpusFunctionSignature> ApplyFunctionDistinctiveness(List<CorpusFunctionSignature> sigs)
     {
+        int totalLibraries = sigs.Select(f => f.LibraryName).Distinct(StringComparer.Ordinal).Count();
         Dictionary<ulong, int> libraryCountByHash = sigs
             .GroupBy(f => f.CfgShapeHash)
             .ToDictionary(
@@ -282,7 +300,7 @@ public static class BuildOrchestrator
                 g => g.Select(f => f.LibraryName).Distinct(StringComparer.Ordinal).Count());
 
         return sigs
-            .Select(f => f with { Distinctiveness = 1.0 / libraryCountByHash[f.CfgShapeHash] })
+            .Select(f => f with { Distinctiveness = Idf(libraryCountByHash[f.CfgShapeHash], totalLibraries) })
             .OrderBy(f => f.LibraryName, StringComparer.Ordinal)
             .ThenBy(f => f.FunctionName, StringComparer.Ordinal)
             .ToList();

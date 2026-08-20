@@ -22,7 +22,8 @@ public static class BenchmarkRunner
     };
 
     public static BenchmarkReport Run(
-        string corpusPath, string binariesDir, string groundTruthPath, string checkpoint, string? modelPath = null)
+        string corpusPath, string binariesDir, string groundTruthPath, string checkpoint,
+        string? modelPath = null, double minConfidence = 0.25)
     {
         ArgumentException.ThrowIfNullOrEmpty(corpusPath);
         ArgumentException.ThrowIfNullOrEmpty(binariesDir);
@@ -80,7 +81,10 @@ public static class BenchmarkRunner
             stopwatch.Stop();
             totalMs += stopwatch.Elapsed.TotalMilliseconds;
 
+            // Only components at or above the identification threshold are counted as "identified";
+            // below-threshold matches are the low-confidence bucket (FR-015), not a claim.
             Dictionary<string, string> predictedByLib = result.Components
+                .Where(c => c.Confidence >= minConfidence)
                 .ToDictionary(c => c.LibraryName, c => c.Version.Display, StringComparer.OrdinalIgnoreCase);
             HashSet<string> predictedLibs = new(predictedByLib.Keys, StringComparer.OrdinalIgnoreCase);
 

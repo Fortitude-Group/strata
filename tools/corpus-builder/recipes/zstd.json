@@ -1,0 +1,12 @@
+{
+  "name": "zstd",
+  "purl": "pkg:generic/zstd",
+  "knownLicense": "BSD-3-Clause",
+  "sourceUrl": "https://github.com/facebook/zstd",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [
+    { "version": "1.5.5", "cveFlagged": false },
+    { "version": "1.5.6", "cveFlagged": false }
+  ],
+  "buildFlags": ["-O0", "-O2", "-O3", "-Os"]
+}

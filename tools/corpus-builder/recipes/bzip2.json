@@ -1,0 +1,11 @@
+{
+  "name": "bzip2",
+  "purl": "pkg:generic/bzip2",
+  "knownLicense": "bzip2-1.0.6",
+  "sourceUrl": "https://github.com/libarchive/bzip2",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [
+    { "version": "1.0.8", "cveFlagged": true }
+  ],
+  "buildFlags": ["-O0", "-O2", "-O3", "-Os"]
+}

@@ -35,7 +35,7 @@ public static class ScanCommand
             var options = new ScanOptions
             {
                 Load = new LoadOptions { MaxInputBytes = maxBytes },
-                Match = new MatchOptions { MinConfidence = args.GetDouble("min-confidence", 0.5) },
+                Match = new MatchOptions { MinConfidence = args.GetDouble("min-confidence", 0.25) },
                 ModelPath = args.Get("model"),
             };
 

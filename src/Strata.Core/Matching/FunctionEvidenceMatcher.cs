@@ -19,9 +19,14 @@ public sealed record LibraryFunctionEvidence(
 /// </summary>
 public sealed class FunctionEvidenceMatcher
 {
+    /// <summary>Functions below this instruction count are too small to fingerprint reliably (their
+    /// MinHash collides coincidentally) and are non-distinctive — excluded from matching to kill the
+    /// dominant cross-library false-positive source.</summary>
+    public const int MinInstructions = 8;
+
     private readonly double _similarityThreshold;
 
-    public FunctionEvidenceMatcher(double similarityThreshold = 0.7) =>
+    public FunctionEvidenceMatcher(double similarityThreshold = 0.75) =>
         _similarityThreshold = similarityThreshold;
 
     public IReadOnlyList<LibraryFunctionEvidence> Match(
@@ -51,6 +56,11 @@ public sealed class FunctionEvidenceMatcher
 
         foreach (TargetFunction tf in targetFunctions)
         {
+            if (tf.Function.Mnemonics.Count < MinInstructions)
+            {
+                continue; // too small to fingerprint reliably
+            }
+
             (CorpusFunctionSignature corpusFn, double sim)? best = BestMatch(tf.Signature, index, corpus, embeddedCorpus);
             if (best is null)
             {

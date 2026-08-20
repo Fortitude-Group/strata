@@ -17,8 +17,11 @@ public sealed class StringEvidenceMatcher : IMatcher
         ArgumentNullException.ThrowIfNull(corpus);
         ArgumentNullException.ThrowIfNull(options);
 
-        // Distinct string values present in the target.
-        var targetStrings = target.Strings.Select(s => s.Value).ToHashSet(StringComparer.Ordinal);
+        // Distinct string values present in the target, excluding ELF/toolchain metadata noise.
+        var targetStrings = target.Strings
+            .Select(s => s.Value)
+            .Where(v => !Ingestion.StringNoise.IsMetadata(v))
+            .ToHashSet(StringComparer.Ordinal);
 
         // Group corpus signatures by library once.
         var byLibrary = corpus.StringSignatures
