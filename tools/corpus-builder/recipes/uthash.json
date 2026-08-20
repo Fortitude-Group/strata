@@ -1,0 +1,9 @@
+{
+  "name": "uthash",
+  "purl": "pkg:generic/uthash",
+  "knownLicense": "BSD-1-Clause",
+  "sourceUrl": "https://github.com/troydhanson/uthash",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "2.3.0", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

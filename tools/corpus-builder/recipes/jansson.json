@@ -1,0 +1,9 @@
+{
+  "name": "jansson",
+  "purl": "pkg:generic/jansson",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/akheron/jansson",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "2.14", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

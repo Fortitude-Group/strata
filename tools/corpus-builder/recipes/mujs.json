@@ -1,0 +1,9 @@
+{
+  "name": "mujs",
+  "purl": "pkg:generic/mujs",
+  "knownLicense": "ISC",
+  "sourceUrl": "https://github.com/ccxvii/mujs",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.3.4", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "mpack",
+  "purl": "pkg:generic/mpack",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/ludocode/mpack",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.1.1", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "libtommath",
+  "purl": "pkg:generic/libtommath",
+  "knownLicense": "Unlicense",
+  "sourceUrl": "https://github.com/libtom/libtommath",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.2.1", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

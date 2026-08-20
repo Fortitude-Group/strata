@@ -1,0 +1,9 @@
+{
+  "name": "xxhash",
+  "purl": "pkg:generic/xxhash",
+  "knownLicense": "BSD-2-Clause",
+  "sourceUrl": "https://github.com/Cyan4973/xxHash",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "0.8.2", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

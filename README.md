@@ -79,10 +79,10 @@ R&D build. The x86-64 (Iced) and AArch64 (Capstone) engines, all three container
 ingestion), the string + function signals, the learned-embedding signal, SBOM output, CVE
 cross-reference, the web demo, the corpus builder, and the benchmark harness are implemented and tested.
 
-On a 21-library real cross-compiler benchmark (corpus built with gcc, targets stripped and built with
+On a 54-library real cross-compiler benchmark (corpus built with gcc, targets stripped and built with
 clang), Strata clears both kill-criteria checkpoints: Checkpoint A at 100% precision on the heuristic
-signals, and Checkpoint B with the embedding lifting recall from 76% to 92% (past the 5-point bar).
-19 of 21 libraries identify at 100% precision and 100% recall, including mbedTLS and expat. The
+signals, and Checkpoint B with the embedding lifting recall from 77.6% to 90.2% (past the 5-point bar).
+48 of 54 libraries identify at 100% precision and 100% recall, including mbedTLS and expat. The
 remaining work is growing the reference corpus toward the common few-hundred libraries; the mechanism
 and the harness are in place. See [`docs/benchmarks/`](docs/benchmarks/README.md) and
 [`specs/001-strata-binary-sbom/tasks.md`](specs/001-strata-binary-sbom/tasks.md).

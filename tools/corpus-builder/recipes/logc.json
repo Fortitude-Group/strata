@@ -1,0 +1,9 @@
+{
+  "name": "logc",
+  "purl": "pkg:generic/logc",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/rxi/log.c",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "0.1", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

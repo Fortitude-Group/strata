@@ -1,0 +1,9 @@
+{
+  "name": "mqttc",
+  "purl": "pkg:generic/mqttc",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/LiamBindle/MQTT-C",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.1.6", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

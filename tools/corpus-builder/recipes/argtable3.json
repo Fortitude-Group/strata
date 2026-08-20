@@ -1,0 +1,9 @@
+{
+  "name": "argtable3",
+  "purl": "pkg:generic/argtable3",
+  "knownLicense": "BSD-3-Clause",
+  "sourceUrl": "https://github.com/argtable/argtable3",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "3.2.2", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

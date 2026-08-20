@@ -1,0 +1,9 @@
+{
+  "name": "libyaml",
+  "purl": "pkg:generic/libyaml",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/yaml/libyaml",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "0.2.5", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

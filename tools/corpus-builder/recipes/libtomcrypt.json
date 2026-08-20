@@ -1,0 +1,9 @@
+{
+  "name": "libtomcrypt",
+  "purl": "pkg:generic/libtomcrypt",
+  "knownLicense": "Unlicense",
+  "sourceUrl": "https://github.com/libtom/libtomcrypt",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.18.2", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

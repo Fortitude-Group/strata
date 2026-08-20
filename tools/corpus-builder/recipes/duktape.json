@@ -1,0 +1,9 @@
+{
+  "name": "duktape",
+  "purl": "pkg:generic/duktape",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/svaarala/duktape",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "2.7.0", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

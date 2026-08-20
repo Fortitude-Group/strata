@@ -1,0 +1,9 @@
+{
+  "name": "tinyexpr",
+  "purl": "pkg:generic/tinyexpr",
+  "knownLicense": "Zlib",
+  "sourceUrl": "https://github.com/codeplea/tinyexpr",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.0", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

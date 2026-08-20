@@ -1,0 +1,9 @@
+{
+  "name": "bearssl",
+  "purl": "pkg:generic/bearssl",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/BearSSL/BearSSL",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "0.6", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

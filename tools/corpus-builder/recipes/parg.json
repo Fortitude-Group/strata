@@ -1,0 +1,9 @@
+{
+  "name": "parg",
+  "purl": "pkg:generic/parg",
+  "knownLicense": "CC0-1.0",
+  "sourceUrl": "https://github.com/jibsen/parg",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.0.2", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

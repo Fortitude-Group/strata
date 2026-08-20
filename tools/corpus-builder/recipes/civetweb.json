@@ -1,0 +1,9 @@
+{
+  "name": "civetweb",
+  "purl": "pkg:generic/civetweb",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/civetweb/civetweb",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.16", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

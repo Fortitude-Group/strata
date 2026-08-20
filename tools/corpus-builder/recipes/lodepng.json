@@ -1,0 +1,9 @@
+{
+  "name": "lodepng",
+  "purl": "pkg:generic/lodepng",
+  "knownLicense": "Zlib",
+  "sourceUrl": "https://github.com/lvandeve/lodepng",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.0", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

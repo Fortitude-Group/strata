@@ -1,0 +1,9 @@
+{
+  "name": "libhydrogen",
+  "purl": "pkg:generic/libhydrogen",
+  "knownLicense": "ISC",
+  "sourceUrl": "https://github.com/jedisct1/libhydrogen",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.0.4", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

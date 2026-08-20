@@ -1,0 +1,9 @@
+{
+  "name": "tinycthread",
+  "purl": "pkg:generic/tinycthread",
+  "knownLicense": "Zlib",
+  "sourceUrl": "https://github.com/tinycthread/tinycthread",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.2", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

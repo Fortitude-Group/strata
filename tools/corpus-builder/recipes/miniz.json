@@ -1,0 +1,9 @@
+{
+  "name": "miniz",
+  "purl": "pkg:generic/miniz",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/richgel999/miniz",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "3.0.2", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "cargs",
+  "purl": "pkg:generic/cargs",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/likle/cargs",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.1.0", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

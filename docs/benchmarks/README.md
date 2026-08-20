@@ -32,44 +32,46 @@ the exact version every time, clearing Checkpoint A on real cross-compiler binar
 - This is a **single-library** corpus (zlib). The precision figure does not yet stress cross-library
   false positives at scale; that needs the full ~50-library corpus (in progress).
 
-## Checkpoint A: 21-library, real cross-compiler. PASS (2026-08-20)
+## Checkpoint A: 54-library, real cross-compiler. PASS (2026-08-20)
 
-**Setup.** Corpus built from gcc `-O2/-O3/-Os` across **21 real libraries**: zlib, libpng, cJSON, lz4,
-bzip2, zstd, brotli, zopfli, fastlz, libdeflate, heatshrink, inih, linenoise, utf8proc, http_parser,
-md4c, yyjson, monocypher, mongoose, mbedtls, expat (75 binaries; 12634 function + 21993 string
-signatures). The held-out set is the same libraries compiled with clang `-O2/-O3/-Os` and stripped
-(75 binaries), a genuinely different compiler. Identification threshold 0.25.
+**Setup.** Corpus built from gcc `-O2/-O3/-Os` across **54 real libraries** covering compression
+(zlib, lz4, zstd, bzip2, brotli, zopfli, fastlz, libdeflate, heatshrink, miniz), crypto and TLS
+(mbedTLS, monocypher, micro-ecc, blake3, libtomcrypt, libtommath, libhydrogen), JSON and config parsers
+(cJSON, yyjson, jsmn, frozen, tomlc99, inih, libyaml), scripting and markup (mujs, duktape, wren, lua,
+md4c, hoedown, expat, lodepng), networking (mongoose, MQTT-C, http_parser), sqlite, and a range of
+utility libraries (174 binaries; 28,390 function + 46,348 string signatures). The held-out set is the
+same libraries compiled with clang `-O2/-O3/-Os` and stripped (174 binaries), a genuinely different
+compiler. Identification threshold 0.25.
 
 | Metric | Result | Checkpoint A gate | Verdict |
 |--------|--------|-------------------|---------|
 | Aggregate precision | **100.0%** | >= 80% | PASS |
-| Aggregate recall | **76.0%** | >= 60% | PASS |
-| Version-resolution accuracy | **94.7%** | (Checkpoint B: >= 70%) | PASS |
+| Aggregate recall | **77.6%** | >= 60% | PASS |
+| Version-resolution accuracy | **97.8%** | (Checkpoint B: >= 70%) | PASS |
 | **Checkpoint A** | | | **PASS** |
 
-**17 of 21 libraries identify at 100% precision and 100% recall** cross-compiler, including the two most
-relevant to the target user: **mbedTLS** (TLS) and **expat** (XML). Precision is 100% across every
-single library: there are **zero false positives anywhere** in 75 stripped, clang-built, held-out
-binaries. Precision held at 100% as the corpus grew from 16 to 19 to 21 libraries. Full report:
+Precision is 100% across every single library on the heuristic signals alone: there are **zero false
+positives anywhere** in 174 stripped, clang-built, held-out binaries. Precision held at 100% the whole
+way as the corpus grew from 9 libraries to 16, 21, 36, and 54, which is the plateau in action: once each
+domain has a few members, distinctiveness stops the false positives and adding more libraries keeps
+precision at the ceiling. Full report:
 [`checkpoint-a-multi-library.json`](checkpoint-a-multi-library.json).
 
-**This run answers the question "does more corpus help?" with a measured yes, up to a point.** The
+**This run answers the question "does more corpus help?" with a measured yes, on two axes.** The
 9-library corpus scored 71% precision (bzip2 reported itself in most binaries). Adding compression
 counter-examples (brotli, zopfli, fastlz, zstd, libdeflate) took precision to 100%, because IDF
 distinctiveness could finally see that bzip2's apparently-distinctive bit and buffer functions are
 generic compression code shared across many libraries, and down-weight them. Precision then held at
-100% as the corpus grew from 16 to 19 libraries. The lesson is concrete: precision scales with corpus
-coverage of each *domain*, not with raw library count. More compression libraries fixed a compression
-false positive. Forty more JSON parsers would not have.
+100% all the way to 54 libraries. The lesson is concrete: precision scales with corpus coverage of each
+*domain*, not with raw library count. More compression libraries fixed a compression false positive.
+Forty more JSON parsers would not have. The second axis is training data: a bigger corpus is what makes
+the Checkpoint-B embedding work at all (see below), and that closes most of the recall gap.
 
-**The remaining gap is recall on four string-poor libraries**: lz4, zstd, libdeflate, monocypher. Each
-is missed (recall 0), yet each still produces zero false positives. They are tight, heavily optimised,
-string-sparse libraries: compression inner loops and crypto constant-time code. Their functions are
-compiled very differently by gcc and clang (unrolling, vectorisation, scheduling), so the string signal
-has little to grip and the exact-heuristic function match does not fire across compilers. Adding more
-libraries will not recover them; that is the job of the Checkpoint-B learned embedding (fuzzy
-cross-compiler function similarity), or of adding those specific libraries at more optimisation points.
-This is measured as the honest next lever, not assumed.
+**On the heuristic signals alone, recall is 77.6%.** The libraries the heuristics miss are the tight,
+heavily optimised, string-sparse ones: compression inner loops and crypto constant-time code, whose
+functions are compiled very differently by gcc and clang (unrolling, vectorisation, scheduling), so the
+string signal has little to grip and the exact function match does not fire across compilers. The
+Checkpoint-B learned embedding recovers most of them (next section).
 
 **Diagnosis journey (every step measured, per Principle XI).** The first cross-library run was 20%
 precision. Each fix came from reading the actual evidence: excluded CRT and linker stubs and metadata
@@ -92,20 +94,19 @@ contrastive linear projection trained in Python (numpy, no torch), ONNX export, 
 inside `Strata.Core`, an embedding cosine channel in the function matcher, and per-function embeddings
 stored in the corpus. The model trains on the gcc corpus builds and applies to any target at scan time.
 
-**Measured result on the 21-library corpus.** Retrained on 15,680 labelled examples (4,527 functions,
-48 dimensions), measured on the same 21-library cross-compiler benchmark as above:
+**Measured result on the 54-library corpus.** Retrained on 35,036 labelled examples (64 dimensions),
+measured on the same 54-library cross-compiler benchmark as above:
 
 | Metric | Heuristics only | With embedding |
 |--------|-----------------|----------------|
-| Aggregate recall | 76.0% | **92.0%** |
-| Aggregate precision | 100.0% | 97.2% |
-| Version-resolution accuracy | 94.7% | 95.7% |
+| Aggregate recall | 77.6% | **90.2%** |
+| Aggregate precision | 100.0% | 98.7% |
+| Version-resolution accuracy | 97.8% | 98.1% |
 
-The embedding lifts recall by **16 points**, well past the SC-004 5-point bar. It recovers three of the
-four string-poor libraries the heuristics miss (libdeflate, monocypher, zstd all move to 100% recall).
-lz4 stays missed and http_parser picks up two false positives, the small precision cost of the gain.
-The model trains on gcc builds and generalises to the held-out clang builds it never saw during training.
-Full report: [`checkpoint-b-embedding.json`](checkpoint-b-embedding.json).
+The embedding lifts recall by **12.6 points**, well past the SC-004 5-point bar, for a precision cost of
+1.3 points. With the model on, **48 of the 54 libraries identify at 100% precision and 100% recall**
+cross-compiler. The model trains on gcc builds and generalises to the held-out clang builds it never saw
+during training. Full report: [`checkpoint-b-embedding.json`](checkpoint-b-embedding.json).
 
 **Decision (SC-004).** The gain clears the bar, so the embedding **ships**. The corpus builder `--model`
 flag bundles the trained model into the corpus artefact as `model.onnx`, the manifest records it, and

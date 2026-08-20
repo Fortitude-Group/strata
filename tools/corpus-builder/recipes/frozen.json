@@ -1,0 +1,9 @@
+{
+  "name": "frozen",
+  "purl": "pkg:generic/frozen",
+  "knownLicense": "Apache-2.0",
+  "sourceUrl": "https://github.com/cesanta/frozen",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.7", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "hoedown",
+  "purl": "pkg:generic/hoedown",
+  "knownLicense": "ISC",
+  "sourceUrl": "https://github.com/hoedown/hoedown",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "3.0.7", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

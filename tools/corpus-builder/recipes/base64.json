@@ -1,0 +1,9 @@
+{
+  "name": "base64",
+  "purl": "pkg:generic/base64",
+  "knownLicense": "BSD-2-Clause",
+  "sourceUrl": "https://github.com/aklomp/base64",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "0.5.2", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

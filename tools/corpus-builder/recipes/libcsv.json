@@ -1,0 +1,9 @@
+{
+  "name": "libcsv",
+  "purl": "pkg:generic/libcsv",
+  "knownLicense": "LGPL-2.1",
+  "sourceUrl": "https://github.com/rgamble/libcsv",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "3.0.3", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

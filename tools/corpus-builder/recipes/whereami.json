@@ -1,0 +1,9 @@
+{
+  "name": "whereami",
+  "purl": "pkg:generic/whereami",
+  "knownLicense": "MIT",
+  "sourceUrl": "https://github.com/gpakosz/whereami",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "1.0", "cveFlagged": false } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}
