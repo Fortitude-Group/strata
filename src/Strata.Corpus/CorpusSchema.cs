@@ -31,7 +31,21 @@ public static class CorpusSchema
             version_high   TEXT
         );
 
+        CREATE TABLE IF NOT EXISTS function_signature (
+            id             INTEGER PRIMARY KEY,
+            library_id     INTEGER NOT NULL REFERENCES library(id),
+            function_name  TEXT NOT NULL,
+            cfg_shape_hash TEXT NOT NULL,
+            norm_insn_minhash TEXT NOT NULL,
+            distinctiveness REAL NOT NULL,
+            exact_version  TEXT,
+            version_low    TEXT,
+            version_high   TEXT
+        );
+
         CREATE INDEX IF NOT EXISTS ix_string_signature_value ON string_signature(value);
         CREATE INDEX IF NOT EXISTS ix_string_signature_library ON string_signature(library_id);
+        CREATE INDEX IF NOT EXISTS ix_function_signature_cfg ON function_signature(cfg_shape_hash);
+        CREATE INDEX IF NOT EXISTS ix_function_signature_library ON function_signature(library_id);
         """;
 }

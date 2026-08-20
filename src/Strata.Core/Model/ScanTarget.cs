@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Strata.Core.Model;
 
@@ -42,4 +44,11 @@ public sealed record ScanTarget
     public IReadOnlyList<StringLiteral> Strings { get; init; } = [];
 
     public IReadOnlyList<ConstantBlob> Constants { get; init; } = [];
+
+    /// <summary>
+    /// The raw image bytes, kept for disassembly/recovery. JSON-ignored so reports don't embed the
+    /// whole binary; it does not participate in equality (it is derived from the same bytes).
+    /// </summary>
+    [JsonIgnore]
+    public ReadOnlyMemory<byte> Image { get; init; }
 }

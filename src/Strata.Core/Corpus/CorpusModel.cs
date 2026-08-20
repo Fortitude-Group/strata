@@ -43,9 +43,32 @@ public sealed record CorpusStringSignature
 }
 
 /// <summary>
+/// A per-function signature for one corpus library (research.md R5 signals b/c). Produced by the same
+/// fingerprinting code as scan time (Principle I) so target and corpus functions are directly comparable.
+/// </summary>
+public sealed record CorpusFunctionSignature
+{
+    public required string LibraryName { get; init; }
+
+    public required string FunctionName { get; init; }
+
+    public required ulong CfgShapeHash { get; init; }
+
+    public required IReadOnlyList<uint> NormInsnMinHash { get; init; }
+
+    /// <summary>0..1; down-weights functions whose signatures also appear in other libraries (R9).</summary>
+    public double Distinctiveness { get; init; } = 1.0;
+
+    public string? ExactVersion { get; init; }
+
+    public string? VersionLow { get; init; }
+
+    public string? VersionHigh { get; init; }
+}
+
+/// <summary>
 /// A signature corpus: the versioned, indexed set of library signatures scan-time matching runs
-/// against. This MVP exposes the string/constant signal; CFG/instruction/embedding indexes are added
-/// with their fingerprinting tasks.
+/// against — string/constant signatures (signal a) and per-function signatures (signals b/c).
 /// </summary>
 public interface ICorpus
 {
@@ -54,6 +77,12 @@ public interface ICorpus
     /// <summary>All string/constant signatures. Small enough to index in memory for the seed corpus.</summary>
     IReadOnlyList<CorpusStringSignature> StringSignatures { get; }
 
+    /// <summary>All per-function signatures (may be empty for a string-only seed corpus).</summary>
+    IReadOnlyList<CorpusFunctionSignature> FunctionSignatures { get; }
+
     /// <summary>Total number of distinctive string signatures for a library (coverage denominator, R9).</summary>
     int DistinctiveStringCount(string libraryName);
+
+    /// <summary>Total number of function signatures for a library (function-coverage denominator, R9).</summary>
+    int FunctionCount(string libraryName);
 }

@@ -16,25 +16,32 @@ see the **Claude-Flow Parallel Orchestration** section for the fan-out plan the 
 
 ## Implementation status (as of 2026-08-20)
 
-A **working, tested US1 MVP vertical slice** is built and verified — `dotnet build` clean (0 warnings/
-0 errors, all 12 projects) and **19/19 tests green**. `strata scan <elf>` produces valid CycloneDX 1.6
-+ SPDX 2.3 with evidence, confidence, honest unidentified regions, deterministic output, and correct
-exit codes, matching against a SQLite seed corpus. 38 tasks are marked `[X]`.
+**US1 is functionally complete** — the full two-signal engine is built, wired, and verified: `dotnet
+build` clean (0 warnings / 0 errors, all 12 projects) and **23/23 tests green**. `strata scan <elf>`
+runs ingest → **function recovery (Iced x86-64 linear sweep) → CFG build → CFG-shape + normalised-
+instruction MinHash fingerprints → LSH function matching fused with the string/constant signal
+(noisy-OR confidence)** → CycloneDX 1.6 + SPDX 2.3 with per-component evidence, honest **per-function**
+unidentified regions, deterministic output, and pipeline exit codes. **46 tasks marked `[X]`.**
 
-**What the MVP does NOT yet do (honest scope of the `[X]` set):**
-- The identification signal is **string/constant only** (FR-007 signal *a*). Disassembly (T033/T034),
-  function recovery + CFG (T035/T036), CFG-shape and MinHash signals (T038/T039), the `IFingerprinter`
-  combiner (T040), and LSH corpus lookup (T041) are **deferred** — so US1 is a real slice, not the full
-  function-level engine.
-- **File-location deviations** from the task paths (functionally done, different file): T037's string
-  signal lives inside `Matching/StringEvidenceMatcher.cs` (not a separate `Fingerprinting/` file);
-  T016/T017 corpus code is `CorpusSchema.cs`/`CorpusWriter.cs`/`SqliteCorpus.cs` (not `Schema/`+`CorpusStore.cs`);
-  T021 seed generator is `Strata.Corpus/SeedCorpus.cs` (not a `tests/fixtures` script); tests live in
-  `tests/Strata.*.Tests/` (not `tests/contract|integration/`).
-- **Dependency deviations**: T005/T007 heavy deps (Iced, Capstone, ONNX, System.CommandLine) not yet
-  added — the CLI uses a hand-rolled arg parser; FluentAssertions (T008) dropped as commercially
-  licensed (using xUnit asserts). T018/T019/T022 (LSH index, structured logging, fixture-build script)
-  deferred. T001 GitHub remote **not pushed** (local repo only — awaiting go-ahead).
+**Verified working**: Iced decodes real x86-64; branching functions yield multi-block CFGs; identical
+functions match their corpus signature via MinHash/LSH while structurally different ones do not;
+unmatched functions surface as precise unidentified regions (SC-008).
+
+**Honest gaps in the `[X]` set:**
+- **AArch64 decoding (T034, Capstone)** not done — x86-64 only; non-x86 targets degrade cleanly to the
+  string signal. Symbol-driven recovery is a linear-sweep approximation (prologue/symbol refinement pending).
+- **Function-level matching needs a real function corpus to bite**: the seed corpus is string-based, so
+  function matching is proven on synthetic corpora in tests. Populating real function signatures is the
+  corpus builder's job (T059–T063, not yet built) against actually-compiled libraries.
+- **File-location deviations** (functionally done, different file): T037 string signal lives in
+  `Matching/StringEvidenceMatcher.cs`; T018 LSH is `Core/Fingerprinting/LshIndex.cs` (not `Corpus/Index/`);
+  T016/T017 corpus code is `CorpusSchema/CorpusWriter/SqliteCorpus.cs`; T021 seed is `SeedCorpus.cs`;
+  tests live in `tests/Strata.*.Tests/`.
+- **Dependency deviations**: Iced + Microsoft.Data.Sqlite + CycloneDX.Core + Spectre.Console pinned;
+  Capstone/ONNX/System.CommandLine not yet (hand-rolled CLI parser); FluentAssertions dropped (v8
+  commercial licence) in favour of xUnit asserts. T019/T022 (structured logging, fixture-build script)
+  deferred. **T001 GitHub remote NOT pushed** — local repo only, per owner instruction (build full app
+  privately first).
 - **US2–US6, Phase 10 (PE/Mach-O), and Polish are not started.**
 
 ## Format: `[ID] [P?] [Story] Description with file path`
@@ -77,7 +84,7 @@ story depends on.
 - [X] T015 [P] Engine interfaces `IBinaryLoader`/`IFunctionRecovery`/`IFingerprinter`/`IMatcher`/`IScanner`/`ICorpus` + option types (contracts/engine-api.md) in `src/Strata.Core/*.cs`
 - [X] T016 Corpus: signature-DB DDL (SchemaVersion 1, contracts/signature-db.md) + migration runner in `src/Strata.Corpus/Schema/`
 - [X] T017 Corpus: SQLite read/write (library/version/function/signature) + `manifest.json` load/verify in `src/Strata.Corpus/CorpusStore.cs` (depends T016)
-- [ ] T018 [P] Corpus: MinHash-LSH index read/write (`corpus.lsh`) in `src/Strata.Corpus/Index/LshIndex.cs`
+- [X] T018 [P] Corpus: MinHash-LSH index read/write (`corpus.lsh`) in `src/Strata.Corpus/Index/LshIndex.cs`
 - [ ] T019 [P] Diagnostics: structured logging + per-stage telemetry (Principle IV) in `src/Strata.Core/Diagnostics/`
 - [X] T020 [P] Errors: `UnsupportedFormatException`/`CorpusSchemaMismatchException`/`OutOfEnvelopeException` + `ExitCodes` map (contracts/cli.md) in `src/Strata.Core/Errors/` + `src/Strata.Cli/ExitCodes.cs`
 - [X] T021 Seed corpus generator: compile a handful of known libs into a small fixture corpus so US1 is testable, in `tests/fixtures/build-seed-corpus.ps1` (depends T017, T018)
@@ -111,15 +118,15 @@ inputs handled.
 - [X] T030 [P] [US1] String & constant extraction in `src/Strata.Core/Ingestion/StringConstantExtractor.cs`
 - [X] T031 [P] [US1] Format detection + packing/obfuscation detection in `src/Strata.Core/Ingestion/FormatDetector.cs` + `PackingDetector.cs`
 - [X] T032 [US1] `IBinaryLoader` implementation composing readers in `src/Strata.Core/Ingestion/BinaryLoader.cs` (depends T029–T031)
-- [ ] T033 [P] [US1] Iced x86-64 disassembly adapter in `src/Strata.Core/Disassembly/IcedAdapter.cs`
+- [X] T033 [P] [US1] Iced x86-64 disassembly adapter in `src/Strata.Core/Disassembly/IcedAdapter.cs`
 - [ ] T034 [P] [US1] Capstone AArch64 disassembly adapter in `src/Strata.Core/Disassembly/CapstoneAdapter.cs`
-- [ ] T035 [US1] Function-boundary recovery (symbol/call-target/prologue/linear-sweep + confidence) in `src/Strata.Core/Recovery/FunctionRecovery.cs` (depends T032, T033, T034)
-- [ ] T036 [US1] CFG/basic-block construction in `src/Strata.Core/Recovery/CfgBuilder.cs` (depends T035)
+- [X] T035 [US1] Function-boundary recovery (symbol/call-target/prologue/linear-sweep + confidence) in `src/Strata.Core/Recovery/FunctionRecovery.cs` (depends T032, T033, T034)
+- [X] T036 [US1] CFG/basic-block construction in `src/Strata.Core/Recovery/CfgBuilder.cs` (depends T035)
 - [X] T037 [P] [US1] String/constant reference signal in `src/Strata.Core/Fingerprinting/StringConstantSignal.cs`
-- [ ] T038 [P] [US1] CFG-shape hash signal in `src/Strata.Core/Fingerprinting/CfgShapeSignal.cs`
-- [ ] T039 [P] [US1] Normalised instruction-sequence MinHash signal in `src/Strata.Core/Fingerprinting/NormInsnSignal.cs`
-- [ ] T040 [US1] `IFingerprinter` combiner in `src/Strata.Core/Fingerprinting/Fingerprinter.cs` (depends T037–T039)
-- [ ] T041 [US1] Corpus lookup via LSH + exact signals in `src/Strata.Core/Matching/CorpusLookup.cs` (depends T017, T018, T040)
+- [X] T038 [P] [US1] CFG-shape hash signal in `src/Strata.Core/Fingerprinting/CfgShapeSignal.cs`
+- [X] T039 [P] [US1] Normalised instruction-sequence MinHash signal in `src/Strata.Core/Fingerprinting/NormInsnSignal.cs`
+- [X] T040 [US1] `IFingerprinter` combiner in `src/Strata.Core/Fingerprinting/Fingerprinter.cs` (depends T037–T039)
+- [X] T041 [US1] Corpus lookup via LSH + exact signals in `src/Strata.Core/Matching/CorpusLookup.cs` (depends T017, T018, T040)
 - [X] T042 [US1] Function→library aggregation + distinctiveness-weighted confidence in `src/Strata.Core/Matching/ConfidenceScorer.cs` (depends T041)
 - [X] T043 [US1] Coarse version range + unidentified-region computation in `src/Strata.Core/Matching/Matcher.cs` (depends T042)
 - [X] T044 [US1] `IScanner` pipeline with `IProgress<ScanProgress>` streaming in `src/Strata.Core/StrataScanner.cs` (depends T032, T036, T040, T043)

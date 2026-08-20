@@ -22,6 +22,10 @@ public sealed record RecoveredFunction
     /// <summary>CFG edges as (fromBlockIndex, toBlockIndex) pairs.</summary>
     public IReadOnlyList<(int From, int To)> Edges { get; init; } = [];
 
+    /// <summary>Normalised opcode mnemonics in body order (operands abstracted) — the substrate for the
+    /// instruction-sequence signal (research.md R5 signal c).</summary>
+    public IReadOnlyList<string> Mnemonics { get; init; } = [];
+
     /// <summary>0..1 confidence that this is a real function boundary.</summary>
     public double RecoveryConfidence { get; init; } = 1.0;
 

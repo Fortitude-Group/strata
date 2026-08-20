@@ -11,14 +11,22 @@ namespace Strata.Core.Corpus;
 public sealed class InMemoryCorpus : ICorpus
 {
     private readonly Dictionary<string, int> _distinctiveCounts;
+    private readonly Dictionary<string, int> _functionCounts;
 
-    public InMemoryCorpus(CorpusManifest manifest, IReadOnlyList<CorpusStringSignature> signatures)
+    public InMemoryCorpus(
+        CorpusManifest manifest,
+        IReadOnlyList<CorpusStringSignature> signatures,
+        IReadOnlyList<CorpusFunctionSignature>? functionSignatures = null)
     {
         ArgumentNullException.ThrowIfNull(manifest);
         ArgumentNullException.ThrowIfNull(signatures);
         Manifest = manifest;
         StringSignatures = signatures;
+        FunctionSignatures = functionSignatures ?? [];
         _distinctiveCounts = signatures
+            .GroupBy(s => s.LibraryName, StringComparer.Ordinal)
+            .ToDictionary(g => g.Key, g => g.Count(), StringComparer.Ordinal);
+        _functionCounts = FunctionSignatures
             .GroupBy(s => s.LibraryName, StringComparer.Ordinal)
             .ToDictionary(g => g.Key, g => g.Count(), StringComparer.Ordinal);
     }
@@ -27,6 +35,11 @@ public sealed class InMemoryCorpus : ICorpus
 
     public IReadOnlyList<CorpusStringSignature> StringSignatures { get; }
 
+    public IReadOnlyList<CorpusFunctionSignature> FunctionSignatures { get; }
+
     public int DistinctiveStringCount(string libraryName) =>
         _distinctiveCounts.TryGetValue(libraryName, out int count) ? count : 0;
+
+    public int FunctionCount(string libraryName) =>
+        _functionCounts.TryGetValue(libraryName, out int count) ? count : 0;
 }

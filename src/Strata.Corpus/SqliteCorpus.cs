@@ -59,6 +59,33 @@ public static class SqliteCorpus
             }
         }
 
+        var functionSignatures = new List<CorpusFunctionSignature>();
+        using (var cmd = conn.CreateCommand())
+        {
+            cmd.CommandText = """
+                SELECT l.name, f.function_name, f.cfg_shape_hash, f.norm_insn_minhash, f.distinctiveness,
+                       f.exact_version, f.version_low, f.version_high
+                FROM function_signature f
+                JOIN library l ON l.id = f.library_id
+                ORDER BY l.name, f.function_name;
+                """;
+            using SqliteDataReader r = cmd.ExecuteReader();
+            while (r.Read())
+            {
+                functionSignatures.Add(new CorpusFunctionSignature
+                {
+                    LibraryName = r.GetString(0),
+                    FunctionName = r.GetString(1),
+                    CfgShapeHash = ulong.Parse(r.GetString(2), CultureInfo.InvariantCulture),
+                    NormInsnMinHash = ParseMinHash(r.GetString(3)),
+                    Distinctiveness = r.GetDouble(4),
+                    ExactVersion = r.IsDBNull(5) ? null : r.GetString(5),
+                    VersionLow = r.IsDBNull(6) ? null : r.GetString(6),
+                    VersionHigh = r.IsDBNull(7) ? null : r.GetString(7),
+                });
+            }
+        }
+
         var manifest = new CorpusManifest
         {
             CorpusVersion = meta.GetValueOrDefault("corpus_version", "0.0.0"),
@@ -67,7 +94,7 @@ public static class SqliteCorpus
             ModelVersion = meta.GetValueOrDefault("model_version"),
         };
 
-        return new InMemoryCorpus(manifest, signatures);
+        return new InMemoryCorpus(manifest, signatures, functionSignatures);
     }
 
     private static Dictionary<string, string> ReadMeta(SqliteConnection conn)
@@ -86,4 +113,21 @@ public static class SqliteCorpus
 
     private static int ParseInt(string? s, int fallback) =>
         int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out int v) ? v : fallback;
+
+    private static uint[] ParseMinHash(string csv)
+    {
+        if (string.IsNullOrEmpty(csv))
+        {
+            return [];
+        }
+
+        string[] parts = csv.Split(',', StringSplitOptions.RemoveEmptyEntries);
+        var values = new uint[parts.Length];
+        for (int i = 0; i < parts.Length; i++)
+        {
+            values[i] = uint.Parse(parts[i], CultureInfo.InvariantCulture);
+        }
+
+        return values;
+    }
 }

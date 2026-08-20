@@ -15,8 +15,10 @@ public static class CorpusWriter
         string dbPath,
         string corpusVersion,
         IReadOnlyList<CorpusStringSignature> signatures,
+        IReadOnlyList<CorpusFunctionSignature>? functionSignatures = null,
         string? modelVersion = null)
     {
+        functionSignatures ??= [];
         var csb = new SqliteConnectionStringBuilder { DataSource = dbPath };
         using var conn = new SqliteConnection(csb.ConnectionString);
         conn.Open();
@@ -36,24 +38,31 @@ public static class CorpusWriter
         }
 
         var libraryIds = new Dictionary<string, long>(System.StringComparer.Ordinal);
-        long nextLibraryId = 1;
+        long[] nextLibraryId = [1];
+
+        long EnsureLibrary(string name, string? purl, string? license)
+        {
+            if (libraryIds.TryGetValue(name, out long existing))
+            {
+                return existing;
+            }
+
+            long libId = nextLibraryId[0]++;
+            libraryIds[name] = libId;
+            using var libCmd = conn.CreateCommand();
+            libCmd.CommandText =
+                "INSERT INTO library (id, name, purl, known_license) VALUES ($id, $name, $purl, $lic);";
+            libCmd.Parameters.AddWithValue("$id", libId);
+            libCmd.Parameters.AddWithValue("$name", name);
+            libCmd.Parameters.AddWithValue("$purl", (object?)purl ?? System.DBNull.Value);
+            libCmd.Parameters.AddWithValue("$lic", (object?)license ?? System.DBNull.Value);
+            libCmd.ExecuteNonQuery();
+            return libId;
+        }
 
         foreach (CorpusStringSignature sig in signatures)
         {
-            if (!libraryIds.TryGetValue(sig.LibraryName, out long libId))
-            {
-                libId = nextLibraryId++;
-                libraryIds[sig.LibraryName] = libId;
-                using var libCmd = conn.CreateCommand();
-                libCmd.CommandText =
-                    "INSERT INTO library (id, name, purl, known_license) VALUES ($id, $name, $purl, $lic);";
-                libCmd.Parameters.AddWithValue("$id", libId);
-                libCmd.Parameters.AddWithValue("$name", sig.LibraryName);
-                libCmd.Parameters.AddWithValue("$purl", (object?)sig.Purl ?? System.DBNull.Value);
-                libCmd.Parameters.AddWithValue("$lic", (object?)sig.KnownLicense ?? System.DBNull.Value);
-                libCmd.ExecuteNonQuery();
-            }
-
+            long libId = EnsureLibrary(sig.LibraryName, sig.Purl, sig.KnownLicense);
             using var sigCmd = conn.CreateCommand();
             sigCmd.CommandText = """
                 INSERT INTO string_signature
@@ -67,6 +76,27 @@ public static class CorpusWriter
             sigCmd.Parameters.AddWithValue("$low", (object?)sig.VersionLow ?? System.DBNull.Value);
             sigCmd.Parameters.AddWithValue("$high", (object?)sig.VersionHigh ?? System.DBNull.Value);
             sigCmd.ExecuteNonQuery();
+        }
+
+        foreach (CorpusFunctionSignature fn in functionSignatures)
+        {
+            long libId = EnsureLibrary(fn.LibraryName, null, null);
+            using var fnCmd = conn.CreateCommand();
+            fnCmd.CommandText = """
+                INSERT INTO function_signature
+                    (library_id, function_name, cfg_shape_hash, norm_insn_minhash, distinctiveness,
+                     exact_version, version_low, version_high)
+                VALUES ($lib, $name, $cfg, $mh, $dist, $exact, $low, $high);
+                """;
+            fnCmd.Parameters.AddWithValue("$lib", libId);
+            fnCmd.Parameters.AddWithValue("$name", fn.FunctionName);
+            fnCmd.Parameters.AddWithValue("$cfg", fn.CfgShapeHash.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            fnCmd.Parameters.AddWithValue("$mh", string.Join(',', fn.NormInsnMinHash));
+            fnCmd.Parameters.AddWithValue("$dist", fn.Distinctiveness);
+            fnCmd.Parameters.AddWithValue("$exact", (object?)fn.ExactVersion ?? System.DBNull.Value);
+            fnCmd.Parameters.AddWithValue("$low", (object?)fn.VersionLow ?? System.DBNull.Value);
+            fnCmd.Parameters.AddWithValue("$high", (object?)fn.VersionHigh ?? System.DBNull.Value);
+            fnCmd.ExecuteNonQuery();
         }
 
         WriteMeta(conn, "corpus_version", corpusVersion);

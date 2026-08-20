@@ -56,6 +56,7 @@ public sealed class BinaryLoader : IBinaryLoader
             Symbols = [], // symbol-table parsing lands with function recovery (T035); stripped is the default
             Strings = strings,
             Constants = [],
+            Image = data,
         };
     }
 
