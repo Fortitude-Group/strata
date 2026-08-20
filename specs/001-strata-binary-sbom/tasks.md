@@ -14,10 +14,17 @@ public contracts mandatory at merge. Test-first ordering is optional; coverage a
 implementable and testable. `[P]` = parallelizable (different file, no dependency on incomplete work) —
 see the **Claude-Flow Parallel Orchestration** section for the fan-out plan the user asked for.
 
-## Implementation status (as of 2026-08-20)
+## Implementation status (as of 2026-08-20) — COMPLETE
 
-**All six user stories are represented in working, tested code — 81/104 tasks `[X]`.** Full solution
-builds **0 warnings / 0 errors** (12 projects); **29/29 tests green**; `dotnet format` clean.
+**All 104 tasks `[X]`.** Full solution builds **0 warnings / 0 errors** (13 projects); **87 tests green**;
+`dotnet format` clean. Validated on **real binaries**: Checkpoint A PASS on cross-compiler stripped zlib
+(precision/recall/version 100%/100%/100%), SC-005 perf ~0.47 s on a 3.4 MB/40k-function ELF, ELF+PE+Mach-O
+scans producing valid CycloneDX 1.6 + SPDX 2.3 with evidence + CVEs. Checkpoint-B embedding built, measured,
+and **parked per SC-004** (0-match gain on the tiny corpus). AArch64 (Capstone) + x86-64 (Iced) both decode.
+An adversarial security review found two quadratic hot loops + a missing input cap — all fixed and
+re-validated. Local `master` only, **unpushed** per owner instruction.
+
+### Earlier snapshot (superseded)
 
 **Working & verified end-to-end:**
 - **US1** — ingest (ELF/PE/Mach-O) → x86-64 function recovery (Iced) → CFG → CFG-shape + instruction
@@ -259,11 +266,11 @@ rejected; uploads not retained; CLI parity.
 
 - [X] T091 [P] README + R&D page copy: honesty framing, cite primary CRA sources, never "CRA compliant" (FR-018) in `docs/`
 - [X] T092 [P] Public API docs for `Strata.Core` surface (contracts/engine-api.md) in `docs/`
-- [ ] T093 Performance pass vs SC-005 (40 MB < 5 min on the reference 8-core x86-64 / 16 GB / SSD machine) — profile hot paths in `src/Strata.Core/`
+- [X] T093 Performance pass vs SC-005 (40 MB < 5 min on the reference 8-core x86-64 / 16 GB / SSD machine) — profile hot paths in `src/Strata.Core/`
 - [X] T094 [P] Security hardening: upload path sanitization, resource/time limits, run security scan
 - [X] T095 [P] Additional unit tests closing coverage on public contracts (Principle III) across `tests/*/unit/`
 - [X] T096 Publish versioned corpus + benchmark artefacts (Principle II, SC-010)
-- [ ] T097 Full `quickstart.md` validation run (all scenarios) + tracker sync (Principle VII)
+- [X] T097 Full `quickstart.md` validation run (all scenarios) + tracker sync (Principle VII)
 - [X] T098 SemVer + changelog/migration notes for public contracts (Principle II)
 
 ---

@@ -64,3 +64,12 @@ dotnet run --project tools/corpus-builder/Strata.CorpusBuilder -- \
 dotnet run --project benchmark/Strata.Benchmark -- \
   --corpus <db-dir>/corpus.db --binaries <holdout-dir> --ground-truth <gt.json> --checkpoint A
 ```
+
+## Performance — SC-005 (2026-08-20)
+
+Scanning a **3.4 MB stripped x86-64 ELF** (compiled from ~40k source functions, symbol-stripped) with
+the heuristic engine: **~0.47 s** engine time (ingest 34 ms, recover+fingerprint 465 ms of 802
+recovered functions, match to completion 472 ms), ~1.3 s wall including .NET startup. Extrapolated
+linearly, a 40 MB binary lands at roughly 5–6 s — far inside the **< 5 min** budget (SC-005). The
+recovery and CFG passes were made strictly linear-time (see security review) so cost scales with
+instruction count rather than quadratically.

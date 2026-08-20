@@ -38,11 +38,28 @@ public sealed class FunctionRecovery : IFunctionRecovery
             }
 
             List<ulong> entries = EntryPoints(instrs, section, target.Symbols);
+
+            // Partition the (address-sorted) instruction stream into function bodies in a SINGLE linear
+            // pass over the instructions — entries are sorted and windows are contiguous, so one moving
+            // index assigns each instruction to exactly one function. (Avoids an O(entries×instrs) scan.)
+            int cursor = 0;
             for (int e = 0; e < entries.Count; e++)
             {
                 ulong start = entries[e];
                 ulong end = e + 1 < entries.Count ? entries[e + 1] : section.VirtualAddress + section.Size;
-                List<DecodedInstruction> body = instrs.Where(i => i.Address >= start && i.Address < end).ToList();
+
+                while (cursor < instrs.Count && instrs[cursor].Address < start)
+                {
+                    cursor++;
+                }
+
+                var body = new List<DecodedInstruction>();
+                while (cursor < instrs.Count && instrs[cursor].Address < end)
+                {
+                    body.Add(instrs[cursor]);
+                    cursor++;
+                }
+
                 if (body.Count == 0)
                 {
                     continue;

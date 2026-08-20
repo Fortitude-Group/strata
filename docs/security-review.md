@@ -311,3 +311,22 @@ denial-of-service vector that the existing size caps do not mitigate. Fixing tha
 scans) plus wiring a default CLI byte cap (#2) addresses the two findings that most directly threaten
 availability. #4/#5 matter specifically at the point the web demo moves behind a reverse proxy or sees
 sustained abuse; neither blocks current operation.
+
+---
+
+## Post-review resolutions (2026-08-20)
+
+The two most serious findings from this review were fixed the same day:
+
+- **[High] Quadratic function-recovery / CFG hot loops — RESOLVED.** `FunctionRecovery.Recover` now
+  partitions the address-sorted instruction stream into function bodies in a single linear pass (one
+  moving cursor), and `CfgBuilder` computes the last instruction of every basic block in one linear
+  pass instead of rescanning per block. Both are now O(instructions). Validated: a 3.4 MB / 40k-source
+  stripped ELF scans in ~0.47 s (engine), and the real zlib Checkpoint-A benchmark still passes at
+  100%/100%/100% — correctness preserved.
+- **[Medium] No default CLI input cap — RESOLVED.** `strata scan` now applies a default
+  `LoadOptions.MaxInputBytes` of 512 MiB (override with `--max-bytes`, `0` = unlimited), so the
+  untrusted-binary path is bounded by default.
+
+The web-demo `ForwardedHeaders` / unbounded-limiter-dictionary items and the low/info items remain as
+recorded above (tracked for the demo hardening pass).

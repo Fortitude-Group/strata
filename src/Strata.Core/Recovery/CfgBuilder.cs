@@ -20,11 +20,6 @@ public static class CfgBuilder
 
         ulong funcStart = instructions[0].Address;
         ulong funcEnd = instructions[^1].Address + (ulong)instructions[^1].Length;
-        var byAddress = new Dictionary<ulong, int>();
-        for (int i = 0; i < instructions.Count; i++)
-        {
-            byAddress[instructions[i].Address] = i;
-        }
 
         // Leaders: first instruction, branch targets in-range, and instructions following a terminator.
         var leaders = new SortedSet<ulong> { funcStart };
@@ -59,17 +54,30 @@ public static class CfgBuilder
             blocks.Add(new BasicBlock(b, start, end));
         }
 
+        // Last instruction of each block, computed in ONE linear pass (blocks are address-sorted).
+        var lastByBlock = new DecodedInstruction?[blocks.Count];
+        int bi = 0;
+        foreach (DecodedInstruction ins in instructions)
+        {
+            while (bi + 1 < blocks.Count && ins.Address >= blocks[bi + 1].StartAddress)
+            {
+                bi++;
+            }
+
+            if (ins.Address >= blocks[bi].StartAddress && ins.Address < blocks[bi].EndAddress)
+            {
+                lastByBlock[bi] = ins;
+            }
+        }
+
         var edges = new List<(int, int)>();
         for (int b = 0; b < blocks.Count; b++)
         {
-            BasicBlock block = blocks[b];
-            DecodedInstruction? last = LastInstructionIn(instructions, byAddress, block);
-            if (last is null)
+            if (lastByBlock[b] is not { } lastIns)
             {
                 continue;
             }
 
-            DecodedInstruction lastIns = last.Value;
             ulong fallthrough = lastIns.Address + (ulong)lastIns.Length;
 
             switch (lastIns.Flow)
@@ -91,21 +99,6 @@ public static class CfgBuilder
         }
 
         return (blocks, edges);
-    }
-
-    private static DecodedInstruction? LastInstructionIn(
-        IReadOnlyList<DecodedInstruction> instrs, Dictionary<ulong, int> byAddr, BasicBlock block)
-    {
-        DecodedInstruction? last = null;
-        foreach (DecodedInstruction ins in instrs)
-        {
-            if (ins.Address >= block.StartAddress && ins.Address < block.EndAddress)
-            {
-                last = ins;
-            }
-        }
-
-        return last;
     }
 
     private static void AddEdge(List<(int, int)> edges, Dictionary<ulong, int> byStart, int from, ulong toAddr)

@@ -30,8 +30,11 @@ public static class ScanCommand
         {
             ICorpus corpus = ResolveCorpus(args.Get("corpus"));
 
+            // Default input cap (512 MiB) on the untrusted-binary path; override with --max-bytes (0 = unlimited).
+            long maxBytes = (long)args.GetDouble("max-bytes", 512L * 1024 * 1024);
             var options = new ScanOptions
             {
+                Load = new LoadOptions { MaxInputBytes = maxBytes },
                 Match = new MatchOptions { MinConfidence = args.GetDouble("min-confidence", 0.5) },
                 ModelPath = args.Get("model"),
             };
