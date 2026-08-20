@@ -30,14 +30,40 @@ public sealed class BinaryLoader : IBinaryLoader
         var sections = (IReadOnlyList<Section>)[];
         var entryPoints = (IReadOnlyList<ulong>)[];
 
-        if (format == BinaryFormat.Elf)
+        switch (format)
         {
-            ElfReader.ElfHeader header = ElfReader.ReadHeader(data);
-            arch = header.Architecture;
-            sections = ElfReader.ReadSections(data, header);
-            entryPoints = header.Entry != 0 ? [header.Entry] : [];
-            // A shared object or a .dynamic section implies dynamic linking; otherwise treat as static.
-            linkage = header.IsSharedObject || HasSection(sections, ".dynamic") ? Linkage.Dynamic : Linkage.Static;
+            case BinaryFormat.Elf:
+            {
+                ElfReader.ElfHeader header = ElfReader.ReadHeader(data);
+                arch = header.Architecture;
+                sections = ElfReader.ReadSections(data, header);
+                entryPoints = header.Entry != 0 ? [header.Entry] : [];
+                // A shared object or a .dynamic section implies dynamic linking; otherwise treat as static.
+                linkage = header.IsSharedObject || HasSection(sections, ".dynamic") ? Linkage.Dynamic : Linkage.Static;
+                break;
+            }
+
+            case BinaryFormat.Pe:
+            {
+                PeReader.PeInfo pe = PeReader.Read(data);
+                arch = pe.Architecture;
+                sections = pe.Sections;
+                entryPoints = pe.Entry != 0 ? [pe.Entry] : [];
+                linkage = Linkage.Dynamic; // PE images resolve imports via the loader
+                break;
+            }
+
+            case BinaryFormat.MachO:
+            {
+                MachOReader.MachOInfo macho = MachOReader.Read(data);
+                arch = macho.Architecture;
+                sections = macho.Sections;
+                linkage = Linkage.Dynamic;
+                break;
+            }
+
+            default:
+                break;
         }
 
         IReadOnlyList<StringLiteral> strings = StringConstantExtractor.Extract(data, options.MinStringLength);

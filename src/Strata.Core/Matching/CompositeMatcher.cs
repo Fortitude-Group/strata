@@ -45,7 +45,8 @@ public sealed class CompositeMatcher
             }
             else
             {
-                VersionResolution version = ResolveVersionFromFunctions(fe.MatchedCorpusFunctions, fe.Evidence);
+                VersionResolution version =
+                    Versioning.VersionResolver.FromFunctions(fe.MatchedCorpusFunctions, fe.Evidence);
                 components[fe.LibraryName] = new IdentifiedComponent(
                     fe.LibraryName, version, fe.Coverage, fe.Evidence);
             }
@@ -70,25 +71,6 @@ public sealed class CompositeMatcher
     }
 
     private static double NoisyOr(double a, double b) => Math.Clamp(1.0 - ((1.0 - a) * (1.0 - b)), 0.0, 1.0);
-
-    private static VersionResolution ResolveVersionFromFunctions(
-        IReadOnlyList<CorpusFunctionSignature> matched, IReadOnlyList<EvidenceRecord> evidence)
-    {
-        var exact = matched.Where(m => m.ExactVersion is not null).Select(m => m.ExactVersion!)
-            .Distinct(StringComparer.Ordinal).OrderBy(v => v, StringComparer.Ordinal).ToList();
-        if (exact.Count == 1)
-        {
-            return VersionResolution.OfExact(exact[0], evidence);
-        }
-
-        List<string> lows = matched.Where(m => m.VersionLow is not null).Select(m => m.VersionLow!).ToList();
-        List<string> highs = matched.Where(m => m.VersionHigh is not null).Select(m => m.VersionHigh!).ToList();
-        string low = lows.Count > 0 ? lows.OrderBy(v => v, StringComparer.Ordinal).First()
-                    : exact.Count > 0 ? exact.First() : "unknown";
-        string high = highs.Count > 0 ? highs.OrderBy(v => v, StringComparer.Ordinal).Last()
-                    : exact.Count > 0 ? exact.Last() : "unknown";
-        return VersionResolution.OfRange(low, high, evidence);
-    }
 
     private static IReadOnlyList<UnidentifiedRegion> BuildUnidentifiedRegions(
         IReadOnlyList<TargetFunction> targetFunctions,

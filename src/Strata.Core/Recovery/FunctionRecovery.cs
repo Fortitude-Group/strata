@@ -70,7 +70,9 @@ public sealed class FunctionRecovery : IFunctionRecovery
 
     private static IEnumerable<Section> ExecutableSections(ScanTarget target)
     {
-        var named = target.Sections.Where(s => s.Name is ".text" or "text" or ".init" or ".plt").ToList();
+        var named = target.Sections
+            .Where(s => s.Name is ".text" or "text" or ".init" or ".plt" or "__text")
+            .ToList();
         return named.Count > 0 ? named : target.Sections.Where(s => s.Size > 0);
     }
 

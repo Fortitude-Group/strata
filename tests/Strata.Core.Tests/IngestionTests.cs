@@ -51,4 +51,29 @@ public sealed class IngestionTests
         Assert.Equal(Architecture.X86_64, header.Architecture);
         Assert.True(header.Is64);
     }
+
+    [Fact]
+    public void Detects_and_reads_pe_x86_64()
+    {
+        byte[] pe = new byte[512];
+        pe[0] = (byte)'M'; pe[1] = (byte)'Z';
+        pe[0x3C] = 0x80;                                   // PE header offset
+        pe[0x80] = (byte)'P'; pe[0x81] = (byte)'E';        // "PE\0\0"
+        pe[0x84] = 0x64; pe[0x85] = 0x86;                  // machine = IMAGE_FILE_MACHINE_AMD64
+        pe[0x94] = 0xE0;                                   // SizeOfOptionalHeader
+
+        Assert.Equal(BinaryFormat.Pe, FormatDetector.DetectFormat(pe));
+        Assert.Equal(Architecture.X86_64, PeReader.Read(pe).Architecture);
+    }
+
+    [Fact]
+    public void Detects_and_reads_macho_x86_64()
+    {
+        byte[] mo = new byte[64];
+        mo[0] = 0xCF; mo[1] = 0xFA; mo[2] = 0xED; mo[3] = 0xFE;  // 64-bit LE magic on disk
+        mo[4] = 0x07; mo[5] = 0x00; mo[6] = 0x00; mo[7] = 0x01;  // cputype = CPU_TYPE_X86_64 (LE)
+
+        Assert.Equal(BinaryFormat.MachO, FormatDetector.DetectFormat(mo));
+        Assert.Equal(Architecture.X86_64, MachOReader.Read(mo).Architecture);
+    }
 }

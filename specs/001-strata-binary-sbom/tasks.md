@@ -151,11 +151,11 @@ evidence.
 **Independent Test**: quickstart Scenario 2 — exact version where distinguishing evidence exists, a
 containing range where it does not.
 
-- [ ] T053 [P] [US2] Integration test: exact vs range on zlib version fixtures in `tests/integration/VersionResolutionTests.cs`
-- [ ] T054 [US2] Present/absent function-set diffing across corpus versions in `src/Strata.Core/Versioning/FunctionSetDiff.cs`
+- [X] T053 [P] [US2] Integration test: exact vs range on zlib version fixtures in `tests/integration/VersionResolutionTests.cs`
+- [X] T054 [US2] Present/absent function-set diffing across corpus versions in `src/Strata.Core/Versioning/FunctionSetDiff.cs`
 - [ ] T055 [P] [US2] Version-specific string/constant evidence in `src/Strata.Core/Versioning/VersionStringEvidence.cs`
-- [ ] T056 [US2] Range bounding + precision invariant + `versionBasis` in `src/Strata.Core/Versioning/VersionResolver.cs` (depends T054, T055)
-- [ ] T057 [US2] Wire resolver into `Matcher` + SBOM version/range emission in `src/Strata.Core/Matching/Matcher.cs` + `src/Strata.Sbom/` (depends T056, T043, T045, T046)
+- [X] T056 [US2] Range bounding + precision invariant + `versionBasis` in `src/Strata.Core/Versioning/VersionResolver.cs` (depends T054, T055)
+- [X] T057 [US2] Wire resolver into `Matcher` + SBOM version/range emission in `src/Strata.Core/Matching/Matcher.cs` + `src/Strata.Sbom/` (depends T056, T043, T045, T046)
 - [ ] T058 [US2] Make T053 green; run quickstart Scenario 2 (depends T057)
 
 **Checkpoint**: US1 + US2 both work independently.
@@ -269,9 +269,9 @@ with US2–US6.
 **Independent Test**: scan a known-composition PE and a known-composition Mach-O fixture → expected
 components with evidence (quickstart Scenarios 1–2 re-run for the new formats).
 
-- [ ] T099 [P] PE reader (x86-64 + AArch64): COFF/PE headers, sections, import/export tables, strings/constants in `src/Strata.Core/Ingestion/PeReader.cs`
-- [ ] T100 [P] Mach-O reader (x86-64 + arm64): load commands, sections, symbol/string tables, constants in `src/Strata.Core/Ingestion/MachOReader.cs`
-- [ ] T101 PE/Mach-O format detection + packing detection wired into `FormatDetector`/`PackingDetector`/`BinaryLoader` in `src/Strata.Core/Ingestion/` (depends T099, T100)
+- [X] T099 [P] PE reader (x86-64 + AArch64): COFF/PE headers, sections, import/export tables, strings/constants in `src/Strata.Core/Ingestion/PeReader.cs`
+- [X] T100 [P] Mach-O reader (x86-64 + arm64): load commands, sections, symbol/string tables, constants in `src/Strata.Core/Ingestion/MachOReader.cs`
+- [X] T101 PE/Mach-O format detection + packing detection wired into `FormatDetector`/`PackingDetector`/`BinaryLoader` in `src/Strata.Core/Ingestion/` (depends T099, T100)
 - [ ] T102 [P] PE + Mach-O known-composition fixtures + ground-truth manifests in `tests/fixtures/build-fixtures.ps1`
 - [ ] T103 [P] Integration tests: scan PE and Mach-O fixtures → expected components in `tests/integration/PeMachOScanTests.cs`
 - [ ] T104 Extend corpus builder to emit PE/Mach-O signatures (add Windows/macOS toolchain targets) in `tools/corpus-builder/` (depends T062); re-run quickstart Scenarios 1–2 for PE and Mach-O
