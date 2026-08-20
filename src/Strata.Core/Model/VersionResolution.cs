@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace Strata.Core.Model;
 
 /// <summary>

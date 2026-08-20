@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Strata.Core.Util;
 
 namespace Strata.Core.Fingerprinting;

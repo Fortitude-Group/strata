@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using Strata.Core.Corpus;
 using Strata.Core.Model;
 using Strata.Core.Util;

@@ -1,5 +1,4 @@
 using System.Buffers.Binary;
-using System.Collections.Generic;
 using Strata.Core.Model;
 
 namespace Strata.Core.Ingestion;

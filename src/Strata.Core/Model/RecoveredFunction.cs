@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Strata.Core.Model;
 
 /// <summary>A basic block within a recovered function's control-flow graph.</summary>

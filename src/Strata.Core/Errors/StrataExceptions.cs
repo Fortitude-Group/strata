@@ -1,5 +1,3 @@
-using System;
-
 namespace Strata.Core.Errors;
 
 /// <summary>Base type for all Strata engine errors.</summary>

@@ -1,7 +1,6 @@
 using System.Text;
 using Strata.Core.Ingestion;
 using Strata.Core.Model;
-using Xunit;
 
 namespace Strata.Core.Tests;
 

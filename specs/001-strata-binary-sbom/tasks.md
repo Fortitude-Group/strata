@@ -135,7 +135,7 @@ inputs handled.
 - [X] T047 [P] [US1] Text + JSON report generators in `src/Strata.Sbom/Reports/`
 - [X] T048 [US1] Determinism enforcement (serial/timestamp opt-in) + FR-018 "CRA compliant" language guard in `src/Strata.Sbom/SbomWriter.cs` (depends T045–T047)
 - [X] T049 [US1] `strata scan` command + options + output wiring in `src/Strata.Cli/Commands/ScanCommand.cs` (depends T044, T048)
-- [ ] T050 [US1] `strata version` + `strata corpus info/verify` commands in `src/Strata.Cli/Commands/` (depends T017)
+- [X] T050 [US1] `strata version` + `strata corpus info/verify` commands in `src/Strata.Cli/Commands/` (depends T017)
 - [X] T051 [US1] Exit-code mapping + non-interactive + stderr logging in `src/Strata.Cli/Program.cs` (depends T049)
 - [X] T052 [US1] Make T025–T028 green; run quickstart Scenarios 1 & 3 (depends all US1)
 
@@ -248,7 +248,7 @@ rejected; uploads not retained; CLI parity.
 
 ## Phase 9: Polish & Cross-Cutting Concerns
 
-- [ ] T091 [P] README + R&D page copy: honesty framing, cite primary CRA sources, never "CRA compliant" (FR-018) in `docs/`
+- [X] T091 [P] README + R&D page copy: honesty framing, cite primary CRA sources, never "CRA compliant" (FR-018) in `docs/`
 - [ ] T092 [P] Public API docs for `Strata.Core` surface (contracts/engine-api.md) in `docs/`
 - [ ] T093 Performance pass vs SC-005 (40 MB < 5 min on the reference 8-core x86-64 / 16 GB / SSD machine) — profile hot paths in `src/Strata.Core/`
 - [ ] T094 [P] Security hardening: upload path sanitization, resource/time limits, run security scan

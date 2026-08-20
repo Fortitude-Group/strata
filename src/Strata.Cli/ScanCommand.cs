@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Strata.Core;
 using Strata.Core.Corpus;
 using Strata.Core.Errors;

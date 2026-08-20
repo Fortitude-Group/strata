@@ -1,9 +1,6 @@
-using System.Collections.Generic;
-using Strata.Core;
 using Strata.Core.Corpus;
 using Strata.Core.Matching;
 using Strata.Core.Model;
-using Xunit;
 
 namespace Strata.Core.Tests;
 

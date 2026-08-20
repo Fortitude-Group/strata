@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Strata.CorpusBuilder;
 
 /// <summary>One version entry in a recipe (contracts/corpus-builder.md version-selection policy).</summary>

@@ -1,4 +1,3 @@
-using System;
 using Strata.CorpusBuilder;
 
 const int ExitSuccess = 0;

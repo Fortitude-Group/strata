@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Strata.Core.Corpus;
 
 /// <summary>Metadata about a signature corpus artefact (contracts/signature-db.md).</summary>

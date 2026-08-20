@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Strata.Core.Corpus;
 using Strata.Core.Disassembly;
 using Strata.Core.Fingerprinting;
 using Strata.Core.Matching;
 using Strata.Core.Model;
-using Xunit;
 
 namespace Strata.Core.Tests;
 
@@ -38,7 +34,10 @@ public sealed class FunctionMatchingTests
 
     private static ScanTarget Placeholder() => new()
     {
-        Name = "t", SizeBytes = 0, Format = BinaryFormat.Elf, Architecture = Architecture.X86_64,
+        Name = "t",
+        SizeBytes = 0,
+        Format = BinaryFormat.Elf,
+        Architecture = Architecture.X86_64,
     };
 
     private static ICorpus CorpusWith(TargetFunction fn, string library, string version) => new InMemoryCorpus(

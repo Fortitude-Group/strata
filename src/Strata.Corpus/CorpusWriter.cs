@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
 using Strata.Core.Corpus;
 

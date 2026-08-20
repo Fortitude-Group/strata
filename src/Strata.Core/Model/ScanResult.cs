@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Strata.Core.Model;
 
 /// <summary>Progress event streamed during a scan for UX (FR-024). Never alters the result.</summary>

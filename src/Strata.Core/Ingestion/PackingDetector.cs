@@ -1,4 +1,3 @@
-using System;
 using Strata.Core.Model;
 
 namespace Strata.Core.Ingestion;

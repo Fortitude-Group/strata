@@ -1,6 +1,5 @@
-using System;
-using Strata.Core;
 using Strata.Cli;
+using Strata.Core;
 using Strata.Corpus;
 
 if (args.Length == 0)
@@ -40,12 +39,33 @@ switch (verb)
 int CorpusInfo(ArgMap a)
 {
     string? path = a.Get("corpus");
-    var corpus = path is null ? SeedCorpus.AsCorpus() : SqliteCorpus.Load(path);
+    Strata.Core.Corpus.ICorpus corpus;
+    try
+    {
+        corpus = path is null ? SeedCorpus.AsCorpus() : SqliteCorpus.Load(path);
+    }
+    catch (Strata.Core.Errors.StrataException ex)
+    {
+        Console.Error.WriteLine($"error: {ex.Message}");
+        return ExitCodes.Error;
+    }
+
     Console.Out.WriteLine($"corpus version : {corpus.Manifest.CorpusVersion}");
     Console.Out.WriteLine($"schema version : {corpus.Manifest.SchemaVersion}");
     Console.Out.WriteLine($"libraries      : {corpus.Manifest.LibraryCount}");
-    Console.Out.WriteLine($"signatures     : {corpus.StringSignatures.Count}");
+    Console.Out.WriteLine($"string sigs    : {corpus.StringSignatures.Count}");
+    Console.Out.WriteLine($"function sigs  : {corpus.FunctionSignatures.Count}");
     Console.Out.WriteLine($"model          : {corpus.Manifest.ModelVersion ?? "parked"}");
+
+    if (a.Positional == "verify")
+    {
+        bool schemaOk = corpus.Manifest.SchemaVersion == StrataInfo.SupportedCorpusSchemaVersion;
+        Console.Out.WriteLine(schemaOk
+            ? "verify         : OK (schema supported)"
+            : $"verify         : FAIL (schema {corpus.Manifest.SchemaVersion} not supported by this build)");
+        return schemaOk ? ExitCodes.Success : ExitCodes.Error;
+    }
+
     return ExitCodes.Success;
 }
 

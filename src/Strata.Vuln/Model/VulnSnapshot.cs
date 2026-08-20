@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Strata.Core.Model;
 
 namespace Strata.Vuln.Model;

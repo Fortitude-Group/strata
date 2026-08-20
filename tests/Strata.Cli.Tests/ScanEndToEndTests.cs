@@ -1,11 +1,7 @@
-using System;
-using System.IO;
-using System.Linq;
 using Strata.Core;
 using Strata.Core.Corpus;
 using Strata.Core.Model;
 using Strata.Corpus;
-using Xunit;
 
 namespace Strata.Cli.Tests;
 

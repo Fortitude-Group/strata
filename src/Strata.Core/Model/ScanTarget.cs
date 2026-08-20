@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace Strata.Core.Model;
@@ -14,7 +12,7 @@ public sealed record Symbol(string Name, ulong Address, bool IsImport);
 public sealed record StringLiteral(string Value, ulong Offset);
 
 /// <summary>A run of constant bytes (e.g. a lookup table or magic) recovered from the target.</summary>
-public sealed record ConstantBlob( ulong Offset, byte[] Bytes);
+public sealed record ConstantBlob(ulong Offset, byte[] Bytes);
 
 /// <summary>
 /// The input artefact under analysis after ingestion/parsing (FR-001..005). Immutable snapshot of what

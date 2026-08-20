@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Strata.Benchmark;
 
 /// <summary>Per-library precision/recall breakdown (contracts/corpus-builder.md).</summary>

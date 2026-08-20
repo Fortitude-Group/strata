@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.IO;
 using Strata.Core.Errors;
 using Strata.Core.Model;
 
@@ -33,34 +31,34 @@ public sealed class BinaryLoader : IBinaryLoader
         switch (format)
         {
             case BinaryFormat.Elf:
-            {
-                ElfReader.ElfHeader header = ElfReader.ReadHeader(data);
-                arch = header.Architecture;
-                sections = ElfReader.ReadSections(data, header);
-                entryPoints = header.Entry != 0 ? [header.Entry] : [];
-                // A shared object or a .dynamic section implies dynamic linking; otherwise treat as static.
-                linkage = header.IsSharedObject || HasSection(sections, ".dynamic") ? Linkage.Dynamic : Linkage.Static;
-                break;
-            }
+                {
+                    ElfReader.ElfHeader header = ElfReader.ReadHeader(data);
+                    arch = header.Architecture;
+                    sections = ElfReader.ReadSections(data, header);
+                    entryPoints = header.Entry != 0 ? [header.Entry] : [];
+                    // A shared object or a .dynamic section implies dynamic linking; otherwise treat as static.
+                    linkage = header.IsSharedObject || HasSection(sections, ".dynamic") ? Linkage.Dynamic : Linkage.Static;
+                    break;
+                }
 
             case BinaryFormat.Pe:
-            {
-                PeReader.PeInfo pe = PeReader.Read(data);
-                arch = pe.Architecture;
-                sections = pe.Sections;
-                entryPoints = pe.Entry != 0 ? [pe.Entry] : [];
-                linkage = Linkage.Dynamic; // PE images resolve imports via the loader
-                break;
-            }
+                {
+                    PeReader.PeInfo pe = PeReader.Read(data);
+                    arch = pe.Architecture;
+                    sections = pe.Sections;
+                    entryPoints = pe.Entry != 0 ? [pe.Entry] : [];
+                    linkage = Linkage.Dynamic; // PE images resolve imports via the loader
+                    break;
+                }
 
             case BinaryFormat.MachO:
-            {
-                MachOReader.MachOInfo macho = MachOReader.Read(data);
-                arch = macho.Architecture;
-                sections = macho.Sections;
-                linkage = Linkage.Dynamic;
-                break;
-            }
+                {
+                    MachOReader.MachOInfo macho = MachOReader.Read(data);
+                    arch = macho.Architecture;
+                    sections = macho.Sections;
+                    linkage = Linkage.Dynamic;
+                    break;
+                }
 
             default:
                 break;

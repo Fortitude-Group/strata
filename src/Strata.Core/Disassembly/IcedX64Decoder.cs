@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Iced.Intel;
 using Strata.Core.Model;
 

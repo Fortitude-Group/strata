@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Strata.CorpusBuilder;
 
 /// <summary>One pinned compiler toolchain in the build matrix (contracts/signature-db.md manifest.json).</summary>

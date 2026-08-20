@@ -1,8 +1,5 @@
-using System;
 using System.Text.Json;
 using Strata.Core.Model;
-using Strata.Sbom;
-using Xunit;
 
 namespace Strata.Sbom.Tests;
 

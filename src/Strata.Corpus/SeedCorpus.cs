@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Strata.Core.Corpus;
 
 namespace Strata.Corpus;

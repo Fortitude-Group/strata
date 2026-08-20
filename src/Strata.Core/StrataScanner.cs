@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Strata.Core.Corpus;
 using Strata.Core.Fingerprinting;
 using Strata.Core.Ingestion;
