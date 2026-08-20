@@ -70,18 +70,24 @@ image**; a **GitHub Action** (`action.yml`) wraps it for CI.
 | `src/Strata.Cli` | The `strata` CLI |
 | `src/Strata.Web` | Public Blazor demo (progressive reveal, capped/in-memory uploads) |
 | `tools/corpus-builder` | Reproducible corpus build farm (containerised) |
-| `tools/ml-training` | Off-ship-path model training (PyTorch → ONNX) |
+| `tools/ml-training` | Off-ship-path embedding training (numpy, ONNX export) |
 | `benchmark/Strata.Benchmark` | Held-out precision/recall harness with kill-criteria gates |
 
 ## Status
 
-R&D build under active development. The x86-64 engine, all three container formats (ELF/PE/Mach-O
-ingestion), the string + function signals, SBOM output, CVE cross-reference, the web demo, the corpus
-builder, and the benchmark harness are implemented and tested. AArch64 decoding, the learned embedding
-signal, and a production-scale reference corpus are in progress, tracked in
+R&D build. The x86-64 (Iced) and AArch64 (Capstone) engines, all three container formats (ELF/PE/Mach-O
+ingestion), the string + function signals, the learned-embedding signal, SBOM output, CVE
+cross-reference, the web demo, the corpus builder, and the benchmark harness are implemented and tested.
+
+On a 21-library real cross-compiler benchmark (corpus built with gcc, targets stripped and built with
+clang), Strata clears both kill-criteria checkpoints: Checkpoint A at 100% precision on the heuristic
+signals, and Checkpoint B with the embedding lifting recall from 76% to 92% (past the 5-point bar).
+19 of 21 libraries identify at 100% precision and 100% recall, including mbedTLS and expat. The
+remaining work is growing the reference corpus toward the common few-hundred libraries; the mechanism
+and the harness are in place. See [`docs/benchmarks/`](docs/benchmarks/README.md) and
 [`specs/001-strata-binary-sbom/tasks.md`](specs/001-strata-binary-sbom/tasks.md).
 
-Benchmarks (precision/recall/version accuracy) are published good or bad, per the project's technical
+Benchmarks (precision, recall, version accuracy) are published good or bad, per the project's technical
 kill criteria.
 
 ## License

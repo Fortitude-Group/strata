@@ -85,23 +85,34 @@ filter ELF/toolchain **metadata strings** (section names, `GLIBC_*` tags); **min
 function gate (tiny functions collide); **optimised-only corpus** (drop `-O0` debug boilerplate);
 identification threshold lowered 0.5 → 0.25 to catch genuine cross-compiler matches.
 
-## Checkpoint B: SC-004 embedding decision. **PARKED** (2026-08-20)
+## Checkpoint B: SC-004 embedding decision. PASS, and it ships (2026-08-20)
 
-The full learned-embedding pipeline was built and run end-to-end on the real zlib corpus: symbol-labelled
-training export (1593 examples, 149 functions) → contrastive projection trained in Python (numpy) →
-ONNX export → ONNX Runtime inference in `Strata.Core` → embedding channel in the function matcher →
-corpus rebuilt with embeddings (1605 function signatures).
+The learned-embedding pipeline runs end to end: symbol-labelled training export from the corpus, a
+contrastive linear projection trained in Python (numpy, no torch), ONNX export, ONNX Runtime inference
+inside `Strata.Core`, an embedding cosine channel in the function matcher, and per-function embeddings
+stored in the corpus. The model trains on the gcc corpus builds and applies to any target at scan time.
 
-**Measured result.** On the hardest cross-optimisation case (`-O0` clang target vs `-O2/-O3/-Os` gcc
-corpus), the embedding added **0** additional function matches over heuristics: the crude
-opcode-histogram projection cannot bridge the O0↔O2 instruction-mix gap, and library-level recall was
-already saturated at 100% by the string signal on this string-rich library.
+**Measured result on the 21-library corpus.** Retrained on 15,680 labelled examples (4,527 functions,
+48 dimensions), measured on the same 21-library cross-compiler benchmark as above:
 
-**Decision (SC-004).** The embedding does **not** clear the ≥5-point recall-gain bar, so it is
-**parked**: Strata ships heuristics-first. The inference wiring, corpus embedding storage, trainer, and
-`--model` flag remain in place so a stronger model (deeper architecture, larger multi-library corpus,
-symbol-consistent recovery on both sides) can be dropped in and re-measured without code changes. This
-is the spec's designed outcome, now backed by a real number rather than an assumption.
+| Metric | Heuristics only | With embedding |
+|--------|-----------------|----------------|
+| Aggregate recall | 76.0% | **92.0%** |
+| Aggregate precision | 100.0% | 97.2% |
+| Version-resolution accuracy | 94.7% | 95.7% |
+
+The embedding lifts recall by **16 points**, well past the SC-004 5-point bar. It recovers three of the
+four string-poor libraries the heuristics miss (libdeflate, monocypher, zstd all move to 100% recall).
+lz4 stays missed and http_parser picks up two false positives, the small precision cost of the gain.
+The model trains on gcc builds and generalises to the held-out clang builds it never saw during training.
+Full report: [`checkpoint-b-embedding.json`](checkpoint-b-embedding.json).
+
+**Decision (SC-004).** The gain clears the bar, so the embedding **ships**. The corpus builder `--model`
+flag bundles the trained model into the corpus artefact as `model.onnx`, the manifest records it, and
+`strata scan --corpus <db>` auto-loads a sibling model with no extra flag (`--model` still overrides).
+The earlier decision to park it is superseded. That park was measured on a single-library zlib corpus,
+where the embedding added zero because recall was already saturated by strings; the model needed a real
+multi-library corpus to have signal, and it now has one.
 
 ## Reproducing
 
