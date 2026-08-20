@@ -57,16 +57,24 @@ public static class SqliteCorpus
             }
         }
 
+        // Tolerate corpora that predate the additive `embedding` column (nullable, so a clean read either way).
+        bool hasEmbedding = ColumnExists(conn, "function_signature", "embedding");
         var functionSignatures = new List<CorpusFunctionSignature>();
         using (var cmd = conn.CreateCommand())
         {
-            cmd.CommandText = """
-                SELECT l.name, f.function_name, f.cfg_shape_hash, f.norm_insn_minhash, f.distinctiveness,
-                       f.exact_version, f.version_low, f.version_high, f.embedding
-                FROM function_signature f
-                JOIN library l ON l.id = f.library_id
-                ORDER BY l.name, f.function_name;
-                """;
+            cmd.CommandText = hasEmbedding
+                ? """
+                    SELECT l.name, f.function_name, f.cfg_shape_hash, f.norm_insn_minhash, f.distinctiveness,
+                           f.exact_version, f.version_low, f.version_high, f.embedding
+                    FROM function_signature f JOIN library l ON l.id = f.library_id
+                    ORDER BY l.name, f.function_name;
+                    """
+                : """
+                    SELECT l.name, f.function_name, f.cfg_shape_hash, f.norm_insn_minhash, f.distinctiveness,
+                           f.exact_version, f.version_low, f.version_high, NULL AS embedding
+                    FROM function_signature f JOIN library l ON l.id = f.library_id
+                    ORDER BY l.name, f.function_name;
+                    """;
             using SqliteDataReader r = cmd.ExecuteReader();
             while (r.Read())
             {
@@ -112,6 +120,22 @@ public static class SqliteCorpus
 
     private static int ParseInt(string? s, int fallback) =>
         int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out int v) ? v : fallback;
+
+    private static bool ColumnExists(SqliteConnection conn, string table, string column)
+    {
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = $"PRAGMA table_info({table});";
+        using SqliteDataReader r = cmd.ExecuteReader();
+        while (r.Read())
+        {
+            if (string.Equals(r.GetString(1), column, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     private static uint[] ParseMinHash(string csv)
     {

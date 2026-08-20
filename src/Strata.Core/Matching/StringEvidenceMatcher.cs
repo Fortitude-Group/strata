@@ -38,6 +38,9 @@ public sealed class StringEvidenceMatcher : IMatcher
                 continue;
             }
 
+            // Distinctiveness-weighted coverage ratio (research.md R9). Measured to give materially better
+            // cross-library precision than absolute-mass saturation, which over-identifies any library
+            // sharing a few strings with the target.
             double totalWeight = sigs.Sum(s => s.Distinctiveness);
             double matchedWeight = matched.Sum(s => s.Distinctiveness);
             double confidence = totalWeight > 0 ? Math.Clamp(matchedWeight / totalWeight, 0.0, 1.0) : 0.0;

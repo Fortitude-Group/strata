@@ -330,3 +330,13 @@ The two most serious findings from this review were fixed the same day:
 
 The web-demo `ForwardedHeaders` / unbounded-limiter-dictionary items and the low/info items remain as
 recorded above (tracked for the demo hardening pass).
+
+## Web-demo hardening (2026-08-20)
+
+- **[Med] Proxy-unaware client IP — ADDRESSED.** The web host now registers `ForwardedHeadersOptions`
+  (X-Forwarded-For/Proto) and calls `UseForwardedHeaders()`, so the rate limiter and per-IP scan
+  throttle key on the real client behind a reverse proxy/CDN. Safe default: the headers are ignored
+  until `KnownProxies`/`KnownNetworks` are set at deploy, so no spoofing surface is opened prematurely.
+- **[Low] Unbounded throttle map — ADDRESSED.** `PerIpScanThrottle` caps its tracked-client dictionary
+  (50k) and drains it when saturated, so a flood of distinct (or spoofed) keys can't grow it without
+  limit.

@@ -13,6 +13,9 @@ namespace Strata.Web.Services;
 /// </summary>
 public sealed class PerIpScanThrottle : IDisposable
 {
+    // Bounded so a flood of distinct client keys (e.g. spoofed IPs) can't grow the map without limit.
+    private const int MaxTrackedClients = 50_000;
+
     private readonly ConcurrentDictionary<string, FixedWindowRateLimiter> _limiters = new(StringComparer.Ordinal);
     private readonly DemoOptions _options;
 
@@ -24,6 +27,18 @@ public sealed class PerIpScanThrottle : IDisposable
     /// <summary>Attempts to consume one scan permit for <paramref name="clientKey"/>. Never blocks.</summary>
     public bool TryAcquire(string clientKey)
     {
+        // Cap the tracked-client map: if it is saturated and this is a new key, drain and rebuild rather
+        // than grow unbounded. Existing clients keep working; the reset is a coarse but safe backstop.
+        if (_limiters.Count >= MaxTrackedClients && !_limiters.ContainsKey(clientKey))
+        {
+            foreach (FixedWindowRateLimiter stale in _limiters.Values)
+            {
+                stale.Dispose();
+            }
+
+            _limiters.Clear();
+        }
+
         FixedWindowRateLimiter limiter = _limiters.GetOrAdd(clientKey, _ => new FixedWindowRateLimiter(
             new FixedWindowRateLimiterOptions
             {

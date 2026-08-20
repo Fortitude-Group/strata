@@ -18,6 +18,16 @@ builder.Services.AddScoped<ClientCircuitContext>();
 // remote IP. The expensive Scan() call itself is additionally throttled per-client inside
 // PerIpScanThrottle, since Blazor Server invokes it over a persistent SignalR connection rather
 // than discrete HTTP requests that this middleware can see.
+// Behind a reverse proxy / CDN, honour X-Forwarded-For so the rate limiter and throttle key on the real
+// client IP rather than the proxy's (which would collapse all users into one bucket). SECURITY: only
+// trust these headers from known proxies — set KnownProxies/KnownNetworks at deploy; unset means the
+// headers are ignored (safe default), so this is inert until a proxy is explicitly trusted.
+builder.Services.Configure<Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>(o =>
+{
+    o.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor
+        | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+});
+
 builder.Services.AddRateLimiter(limiterOptions =>
 {
     limiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -41,6 +51,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseForwardedHeaders();
 app.UseHttpsRedirection();
 app.UseRateLimiter();
 
