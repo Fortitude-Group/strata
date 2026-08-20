@@ -1,0 +1,9 @@
+{
+  "name": "mbedtls",
+  "purl": "pkg:generic/mbedtls",
+  "knownLicense": "Apache-2.0",
+  "sourceUrl": "https://github.com/Mbed-TLS/mbedtls",
+  "sha256": "unpinned-offline-fixture",
+  "versions": [ { "version": "3.5.0", "cveFlagged": true } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
+}

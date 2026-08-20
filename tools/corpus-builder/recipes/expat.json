@@ -4,11 +4,6 @@
   "knownLicense": "MIT",
   "sourceUrl": "https://github.com/libexpat/libexpat",
   "sha256": "unpinned-offline-fixture",
-  "versions": [
-    { "version": "2.4.1", "cveFlagged": true },
-    { "version": "2.4.8", "cveFlagged": true },
-    { "version": "2.5.0", "cveFlagged": false },
-    { "version": "2.6.2", "cveFlagged": false }
-  ],
-  "buildFlags": ["-O0", "-O2", "-O3", "-Os"]
+  "versions": [ { "version": "2.6.2", "cveFlagged": true } ],
+  "buildFlags": ["-O2", "-O3", "-Os"]
 }

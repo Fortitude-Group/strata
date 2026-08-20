@@ -1,11 +1,11 @@
 {
   "checkpoint": "A",
-  "corpusVersion": "multi19-1.0.0",
-  "binaryCount": 69,
+  "corpusVersion": "multi21-1.0.0",
+  "binaryCount": 75,
   "aggregatePrecision": 1,
-  "aggregateRecall": 0.7391304347826086,
-  "versionResolutionAccuracy": 0.9411764705882353,
-  "totalWallTimeMilliseconds": 2724.0186000000003,
+  "aggregateRecall": 0.76,
+  "versionResolutionAccuracy": 0.9473684210526315,
+  "totalWallTimeMilliseconds": 3477.359399999999,
   "checkpointVerdict": {
     "checkpoint": "A",
     "precisionThreshold": 0.8,
@@ -33,6 +33,14 @@
     {
       "library": "cJSON",
       "truePositives": 6,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "precision": 1,
+      "recall": 1
+    },
+    {
+      "library": "expat",
+      "truePositives": 3,
       "falsePositives": 0,
       "falseNegatives": 0,
       "precision": 1,
@@ -101,6 +109,14 @@
       "falseNegatives": 6,
       "precision": 0,
       "recall": 0
+    },
+    {
+      "library": "mbedtls",
+      "truePositives": 3,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "precision": 1,
+      "recall": 1
     },
     {
       "library": "md4c",
@@ -176,7 +192,7 @@
       "predictedLibraries": [
         "brotli"
       ],
-      "elapsedMilliseconds": 175.1781,
+      "elapsedMilliseconds": 192.5358,
       "error": null
     },
     {
@@ -187,7 +203,7 @@
       "predictedLibraries": [
         "brotli"
       ],
-      "elapsedMilliseconds": 106.9559,
+      "elapsedMilliseconds": 105.2242,
       "error": null
     },
     {
@@ -198,7 +214,7 @@
       "predictedLibraries": [
         "brotli"
       ],
-      "elapsedMilliseconds": 93.2426,
+      "elapsedMilliseconds": 92.2383,
       "error": null
     },
     {
@@ -209,7 +225,7 @@
       "predictedLibraries": [
         "bzip2"
       ],
-      "elapsedMilliseconds": 30.8388,
+      "elapsedMilliseconds": 38.0801,
       "error": null
     },
     {
@@ -220,7 +236,7 @@
       "predictedLibraries": [
         "bzip2"
       ],
-      "elapsedMilliseconds": 19.1629,
+      "elapsedMilliseconds": 22.2619,
       "error": null
     },
     {
@@ -231,7 +247,7 @@
       "predictedLibraries": [
         "bzip2"
       ],
-      "elapsedMilliseconds": 26.705,
+      "elapsedMilliseconds": 27.9313,
       "error": null
     },
     {
@@ -242,7 +258,7 @@
       "predictedLibraries": [
         "cJSON"
       ],
-      "elapsedMilliseconds": 15.5505,
+      "elapsedMilliseconds": 39.7621,
       "error": null
     },
     {
@@ -253,7 +269,7 @@
       "predictedLibraries": [
         "cJSON"
       ],
-      "elapsedMilliseconds": 20.0749,
+      "elapsedMilliseconds": 21.2596,
       "error": null
     },
     {
@@ -264,7 +280,7 @@
       "predictedLibraries": [
         "cJSON"
       ],
-      "elapsedMilliseconds": 31.5086,
+      "elapsedMilliseconds": 45.4753,
       "error": null
     },
     {
@@ -275,7 +291,7 @@
       "predictedLibraries": [
         "cJSON"
       ],
-      "elapsedMilliseconds": 15.2837,
+      "elapsedMilliseconds": 21.214,
       "error": null
     },
     {
@@ -286,7 +302,7 @@
       "predictedLibraries": [
         "cJSON"
       ],
-      "elapsedMilliseconds": 17.8948,
+      "elapsedMilliseconds": 35.535,
       "error": null
     },
     {
@@ -297,7 +313,40 @@
       "predictedLibraries": [
         "cJSON"
       ],
-      "elapsedMilliseconds": 30.3238,
+      "elapsedMilliseconds": 24.2013,
+      "error": null
+    },
+    {
+      "fileName": "expat-2.6.2-clang-O2.so",
+      "expectedLibraries": [
+        "expat"
+      ],
+      "predictedLibraries": [
+        "expat"
+      ],
+      "elapsedMilliseconds": 68.1257,
+      "error": null
+    },
+    {
+      "fileName": "expat-2.6.2-clang-O3.so",
+      "expectedLibraries": [
+        "expat"
+      ],
+      "predictedLibraries": [
+        "expat"
+      ],
+      "elapsedMilliseconds": 75.9089,
+      "error": null
+    },
+    {
+      "fileName": "expat-2.6.2-clang-Os.so",
+      "expectedLibraries": [
+        "expat"
+      ],
+      "predictedLibraries": [
+        "expat"
+      ],
+      "elapsedMilliseconds": 36.7779,
       "error": null
     },
     {
@@ -308,7 +357,7 @@
       "predictedLibraries": [
         "fastlz"
       ],
-      "elapsedMilliseconds": 7.7213,
+      "elapsedMilliseconds": 38.0471,
       "error": null
     },
     {
@@ -319,7 +368,7 @@
       "predictedLibraries": [
         "fastlz"
       ],
-      "elapsedMilliseconds": 11.9278,
+      "elapsedMilliseconds": 16.2776,
       "error": null
     },
     {
@@ -330,7 +379,7 @@
       "predictedLibraries": [
         "fastlz"
       ],
-      "elapsedMilliseconds": 12.4146,
+      "elapsedMilliseconds": 14.662,
       "error": null
     },
     {
@@ -341,7 +390,7 @@
       "predictedLibraries": [
         "heatshrink"
       ],
-      "elapsedMilliseconds": 22.7775,
+      "elapsedMilliseconds": 16.6133,
       "error": null
     },
     {
@@ -352,7 +401,7 @@
       "predictedLibraries": [
         "heatshrink"
       ],
-      "elapsedMilliseconds": 12.112,
+      "elapsedMilliseconds": 32.1599,
       "error": null
     },
     {
@@ -363,7 +412,7 @@
       "predictedLibraries": [
         "heatshrink"
       ],
-      "elapsedMilliseconds": 6.8196,
+      "elapsedMilliseconds": 16.2022,
       "error": null
     },
     {
@@ -374,7 +423,7 @@
       "predictedLibraries": [
         "http_parser"
       ],
-      "elapsedMilliseconds": 26.5904,
+      "elapsedMilliseconds": 44.7679,
       "error": null
     },
     {
@@ -385,7 +434,7 @@
       "predictedLibraries": [
         "http_parser"
       ],
-      "elapsedMilliseconds": 14.6789,
+      "elapsedMilliseconds": 18.9909,
       "error": null
     },
     {
@@ -396,7 +445,7 @@
       "predictedLibraries": [
         "http_parser"
       ],
-      "elapsedMilliseconds": 8.1462,
+      "elapsedMilliseconds": 40.8756,
       "error": null
     },
     {
@@ -407,7 +456,7 @@
       "predictedLibraries": [
         "inih"
       ],
-      "elapsedMilliseconds": 21.7819,
+      "elapsedMilliseconds": 16.2643,
       "error": null
     },
     {
@@ -418,7 +467,7 @@
       "predictedLibraries": [
         "inih"
       ],
-      "elapsedMilliseconds": 5.7727,
+      "elapsedMilliseconds": 13.7227,
       "error": null
     },
     {
@@ -429,7 +478,7 @@
       "predictedLibraries": [
         "inih"
       ],
-      "elapsedMilliseconds": 10.784,
+      "elapsedMilliseconds": 12.8598,
       "error": null
     },
     {
@@ -438,7 +487,7 @@
         "libdeflate"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 31.0884,
+      "elapsedMilliseconds": 35.9735,
       "error": null
     },
     {
@@ -447,7 +496,7 @@
         "libdeflate"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 18.6136,
+      "elapsedMilliseconds": 31.7395,
       "error": null
     },
     {
@@ -456,7 +505,7 @@
         "libdeflate"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 28.5143,
+      "elapsedMilliseconds": 31.0763,
       "error": null
     },
     {
@@ -467,7 +516,7 @@
       "predictedLibraries": [
         "libpng"
       ],
-      "elapsedMilliseconds": 75.9517,
+      "elapsedMilliseconds": 88.2811,
       "error": null
     },
     {
@@ -478,7 +527,7 @@
       "predictedLibraries": [
         "libpng"
       ],
-      "elapsedMilliseconds": 60.5416,
+      "elapsedMilliseconds": 89.3747,
       "error": null
     },
     {
@@ -489,7 +538,7 @@
       "predictedLibraries": [
         "libpng"
       ],
-      "elapsedMilliseconds": 53.3742,
+      "elapsedMilliseconds": 70.9065,
       "error": null
     },
     {
@@ -500,7 +549,7 @@
       "predictedLibraries": [
         "linenoise"
       ],
-      "elapsedMilliseconds": 12.9226,
+      "elapsedMilliseconds": 16.993,
       "error": null
     },
     {
@@ -511,7 +560,7 @@
       "predictedLibraries": [
         "linenoise"
       ],
-      "elapsedMilliseconds": 16.8324,
+      "elapsedMilliseconds": 9.6544,
       "error": null
     },
     {
@@ -522,7 +571,7 @@
       "predictedLibraries": [
         "linenoise"
       ],
-      "elapsedMilliseconds": 11.9681,
+      "elapsedMilliseconds": 31.587,
       "error": null
     },
     {
@@ -531,7 +580,7 @@
         "lz4"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 52.3419,
+      "elapsedMilliseconds": 72.5439,
       "error": null
     },
     {
@@ -540,7 +589,7 @@
         "lz4"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 66.5446,
+      "elapsedMilliseconds": 61.0639,
       "error": null
     },
     {
@@ -549,7 +598,7 @@
         "lz4"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 53.1566,
+      "elapsedMilliseconds": 52.5739,
       "error": null
     },
     {
@@ -558,7 +607,7 @@
         "lz4"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 65.793,
+      "elapsedMilliseconds": 65.266,
       "error": null
     },
     {
@@ -567,7 +616,7 @@
         "lz4"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 60.6666,
+      "elapsedMilliseconds": 65.6974,
       "error": null
     },
     {
@@ -576,7 +625,40 @@
         "lz4"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 70.8494,
+      "elapsedMilliseconds": 55.68,
+      "error": null
+    },
+    {
+      "fileName": "mbedtls-3.5.0-clang-O2.so",
+      "expectedLibraries": [
+        "mbedtls"
+      ],
+      "predictedLibraries": [
+        "mbedtls"
+      ],
+      "elapsedMilliseconds": 180.8801,
+      "error": null
+    },
+    {
+      "fileName": "mbedtls-3.5.0-clang-O3.so",
+      "expectedLibraries": [
+        "mbedtls"
+      ],
+      "predictedLibraries": [
+        "mbedtls"
+      ],
+      "elapsedMilliseconds": 110.4771,
+      "error": null
+    },
+    {
+      "fileName": "mbedtls-3.5.0-clang-Os.so",
+      "expectedLibraries": [
+        "mbedtls"
+      ],
+      "predictedLibraries": [
+        "mbedtls"
+      ],
+      "elapsedMilliseconds": 78.7648,
       "error": null
     },
     {
@@ -587,7 +669,7 @@
       "predictedLibraries": [
         "md4c"
       ],
-      "elapsedMilliseconds": 23.6758,
+      "elapsedMilliseconds": 28.9188,
       "error": null
     },
     {
@@ -598,7 +680,7 @@
       "predictedLibraries": [
         "md4c"
       ],
-      "elapsedMilliseconds": 38.1988,
+      "elapsedMilliseconds": 29.7846,
       "error": null
     },
     {
@@ -609,7 +691,7 @@
       "predictedLibraries": [
         "md4c"
       ],
-      "elapsedMilliseconds": 24.4491,
+      "elapsedMilliseconds": 36.417,
       "error": null
     },
     {
@@ -620,7 +702,7 @@
       "predictedLibraries": [
         "mongoose"
       ],
-      "elapsedMilliseconds": 52.0643,
+      "elapsedMilliseconds": 17.9188,
       "error": null
     },
     {
@@ -631,7 +713,7 @@
       "predictedLibraries": [
         "mongoose"
       ],
-      "elapsedMilliseconds": 55.7076,
+      "elapsedMilliseconds": 42.4884,
       "error": null
     },
     {
@@ -642,7 +724,7 @@
       "predictedLibraries": [
         "mongoose"
       ],
-      "elapsedMilliseconds": 24.2879,
+      "elapsedMilliseconds": 25.4248,
       "error": null
     },
     {
@@ -651,7 +733,7 @@
         "monocypher"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 29.9671,
+      "elapsedMilliseconds": 39.812,
       "error": null
     },
     {
@@ -660,7 +742,7 @@
         "monocypher"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 36.4783,
+      "elapsedMilliseconds": 19.4802,
       "error": null
     },
     {
@@ -669,7 +751,7 @@
         "monocypher"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 27.7956,
+      "elapsedMilliseconds": 22.9291,
       "error": null
     },
     {
@@ -680,7 +762,7 @@
       "predictedLibraries": [
         "utf8proc"
       ],
-      "elapsedMilliseconds": 10.8225,
+      "elapsedMilliseconds": 14.3777,
       "error": null
     },
     {
@@ -691,7 +773,7 @@
       "predictedLibraries": [
         "utf8proc"
       ],
-      "elapsedMilliseconds": 14.921,
+      "elapsedMilliseconds": 31.782,
       "error": null
     },
     {
@@ -702,7 +784,7 @@
       "predictedLibraries": [
         "utf8proc"
       ],
-      "elapsedMilliseconds": 10.0081,
+      "elapsedMilliseconds": 16.4385,
       "error": null
     },
     {
@@ -713,7 +795,7 @@
       "predictedLibraries": [
         "yyjson"
       ],
-      "elapsedMilliseconds": 41.8799,
+      "elapsedMilliseconds": 42.9473,
       "error": null
     },
     {
@@ -724,7 +806,7 @@
       "predictedLibraries": [
         "yyjson"
       ],
-      "elapsedMilliseconds": 59.3988,
+      "elapsedMilliseconds": 39.4706,
       "error": null
     },
     {
@@ -735,7 +817,7 @@
       "predictedLibraries": [
         "yyjson"
       ],
-      "elapsedMilliseconds": 61.1841,
+      "elapsedMilliseconds": 34.8279,
       "error": null
     },
     {
@@ -746,7 +828,7 @@
       "predictedLibraries": [
         "zlib"
       ],
-      "elapsedMilliseconds": 30.5319,
+      "elapsedMilliseconds": 34.6216,
       "error": null
     },
     {
@@ -757,7 +839,7 @@
       "predictedLibraries": [
         "zlib"
       ],
-      "elapsedMilliseconds": 31.5107,
+      "elapsedMilliseconds": 16.4203,
       "error": null
     },
     {
@@ -768,7 +850,7 @@
       "predictedLibraries": [
         "zlib"
       ],
-      "elapsedMilliseconds": 18.0521,
+      "elapsedMilliseconds": 59.6429,
       "error": null
     },
     {
@@ -779,7 +861,7 @@
       "predictedLibraries": [
         "zlib"
       ],
-      "elapsedMilliseconds": 28.2464,
+      "elapsedMilliseconds": 47.6299,
       "error": null
     },
     {
@@ -790,7 +872,7 @@
       "predictedLibraries": [
         "zlib"
       ],
-      "elapsedMilliseconds": 20.001,
+      "elapsedMilliseconds": 27.2144,
       "error": null
     },
     {
@@ -801,7 +883,7 @@
       "predictedLibraries": [
         "zlib"
       ],
-      "elapsedMilliseconds": 26.754,
+      "elapsedMilliseconds": 28.2913,
       "error": null
     },
     {
@@ -812,7 +894,7 @@
       "predictedLibraries": [
         "zopfli"
       ],
-      "elapsedMilliseconds": 13.68,
+      "elapsedMilliseconds": 20.7002,
       "error": null
     },
     {
@@ -823,7 +905,7 @@
       "predictedLibraries": [
         "zopfli"
       ],
-      "elapsedMilliseconds": 21.2457,
+      "elapsedMilliseconds": 24.7076,
       "error": null
     },
     {
@@ -834,7 +916,7 @@
       "predictedLibraries": [
         "zopfli"
       ],
-      "elapsedMilliseconds": 26.4083,
+      "elapsedMilliseconds": 24.986,
       "error": null
     },
     {
@@ -843,7 +925,7 @@
         "zstd"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 113.7772,
+      "elapsedMilliseconds": 81.0561,
       "error": null
     },
     {
@@ -852,7 +934,7 @@
         "zstd"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 109.0088,
+      "elapsedMilliseconds": 75.7722,
       "error": null
     },
     {
@@ -861,7 +943,7 @@
         "zstd"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 78.0803,
+      "elapsedMilliseconds": 73.1148,
       "error": null
     },
     {
@@ -870,7 +952,7 @@
         "zstd"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 102.7132,
+      "elapsedMilliseconds": 80.723,
       "error": null
     },
     {
@@ -879,7 +961,7 @@
         "zstd"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 87.8407,
+      "elapsedMilliseconds": 96.6868,
       "error": null
     },
     {
@@ -888,7 +970,7 @@
         "zstd"
       ],
       "predictedLibraries": [],
-      "elapsedMilliseconds": 81.9239,
+      "elapsedMilliseconds": 66.2668,
       "error": null
     }
   ]

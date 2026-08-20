@@ -32,24 +32,26 @@ the exact version every time — clearing Checkpoint A on real cross-compiler bi
 - This is a **single-library** corpus (zlib). The precision figure does not yet stress cross-library
   false positives at scale; that needs the full ~50-library corpus (in progress).
 
-## Checkpoint A: 19-library, real cross-compiler. PASS (2026-08-20)
+## Checkpoint A: 21-library, real cross-compiler. PASS (2026-08-20)
 
-**Setup.** Corpus built from gcc `-O2/-O3/-Os` across **19 real libraries**: zlib, libpng, cJSON, lz4,
+**Setup.** Corpus built from gcc `-O2/-O3/-Os` across **21 real libraries**: zlib, libpng, cJSON, lz4,
 bzip2, zstd, brotli, zopfli, fastlz, libdeflate, heatshrink, inih, linenoise, utf8proc, http_parser,
-md4c, yyjson, monocypher, mongoose (69 binaries; 8330 function + 15299 string signatures). The held-out
-set is the same libraries compiled with clang `-O2/-O3/-Os` and stripped (69 binaries), a genuinely
-different compiler. Identification threshold 0.25.
+md4c, yyjson, monocypher, mongoose, mbedtls, expat (75 binaries; 12634 function + 21993 string
+signatures). The held-out set is the same libraries compiled with clang `-O2/-O3/-Os` and stripped
+(75 binaries), a genuinely different compiler. Identification threshold 0.25.
 
 | Metric | Result | Checkpoint A gate | Verdict |
 |--------|--------|-------------------|---------|
 | Aggregate precision | **100.0%** | >= 80% | PASS |
-| Aggregate recall | **73.9%** | >= 60% | PASS |
-| Version-resolution accuracy | **94.1%** | (Checkpoint B: >= 70%) | PASS |
+| Aggregate recall | **76.0%** | >= 60% | PASS |
+| Version-resolution accuracy | **94.7%** | (Checkpoint B: >= 70%) | PASS |
 | **Checkpoint A** | | | **PASS** |
 
-**15 of 19 libraries identify at 100% precision and 100% recall** cross-compiler. Precision is 100%
-across every single library: there are **zero false positives anywhere** in 69 stripped, clang-built,
-held-out binaries. Full report: [`checkpoint-a-multi-library.json`](checkpoint-a-multi-library.json).
+**17 of 21 libraries identify at 100% precision and 100% recall** cross-compiler, including the two most
+relevant to the target user: **mbedTLS** (TLS) and **expat** (XML). Precision is 100% across every
+single library: there are **zero false positives anywhere** in 75 stripped, clang-built, held-out
+binaries. Precision held at 100% as the corpus grew from 16 to 19 to 21 libraries. Full report:
+[`checkpoint-a-multi-library.json`](checkpoint-a-multi-library.json).
 
 **This run answers the question "does more corpus help?" with a measured yes, up to a point.** The
 9-library corpus scored 71% precision (bzip2 reported itself in most binaries). Adding compression
