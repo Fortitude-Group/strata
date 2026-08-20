@@ -53,7 +53,7 @@ Thumbs.db
 *.tmp
 *.swp
 
-# Local Claude Code tooling (not part of Strata)
+# Local Claude Code / Spec Kit tooling (not part of Strata)
 .claude/
 skills-lock.json
-.specify/scripts/__pycache__/
+.specify/

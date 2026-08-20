@@ -229,4 +229,4 @@ synthesised as one coherent architecture rather than researched in isolation. Fo
 | 5b. Web demo retention | **None — in-memory, deleted after response** (R14) |
 | 6. Demo hosting / cap / abuse | **Fortitude R&D host, fixed upload cap + throttle, no login; values set at deploy** (R14) |
 
-All Technical-Context unknowns resolved. No NEEDS CLARIFICATION remain.
+All open technical questions above are resolved; the decisions feed directly into the plan.

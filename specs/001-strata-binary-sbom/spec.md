@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "docs/brainstorm-binary-to-sbom.md" — a tool that takes a compiled, stripped, possibly statically-linked native binary with no source and no debug info, and produces a CycloneDX/SPDX SBOM of the open-source libraries and versions compiled into it, each with a confidence score and evidence.
+**Scope**: A tool that takes a compiled, stripped, possibly statically-linked native binary with no source and no debug info, and produces a CycloneDX/SPDX SBOM of the open-source libraries and versions compiled into it, each with a confidence score and evidence.
 
 ## User Scenarios & Testing *(mandatory)*
 

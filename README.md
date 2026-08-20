@@ -84,8 +84,7 @@ clang), Strata clears both kill-criteria checkpoints: Checkpoint A at 100% preci
 signals, and Checkpoint B with the embedding lifting recall from 77.6% to 90.2% (past the 5-point bar).
 48 of 54 libraries identify at 100% precision and 100% recall, including mbedTLS and expat. The
 remaining work is growing the reference corpus toward the common few-hundred libraries; the mechanism
-and the harness are in place. See [`docs/benchmarks/`](docs/benchmarks/README.md) and
-[`specs/001-strata-binary-sbom/tasks.md`](specs/001-strata-binary-sbom/tasks.md).
+and the harness are in place. See [`docs/benchmarks/`](docs/benchmarks/README.md).
 
 Benchmarks (precision, recall, version accuracy) are published good or bad, per the project's technical
 kill criteria.

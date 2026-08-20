@@ -105,8 +105,8 @@ with a validated Checkpoint A pass on real cross-compiler zlib.
   planned (`specs/001-strata-binary-sbom/plan.md`). A minimal positional + `--flag`/`--key value`
   parser was sufficient for the CLI's actual surface and avoided an extra dependency; revisit if the
   CLI's argument surface grows materially.
-- **FluentAssertions was dropped** from the test dependency set as originally pinned
-  (`tasks.md` T008) because it is now a commercially licensed package incompatible with Strata's
+- **FluentAssertions was dropped** from the test dependency set it was originally pinned
+  to, because it is now a commercially licensed package incompatible with Strata's
   Apache-2.0, dependency-light posture. Tests use xUnit's built-in assertions instead.
 - **AArch64 decoding, PE/Mach-O ingestion, and the learned-embedding signal** were all originally
   tracked as "in progress" in the README's Status section; as of this build all three have shipped:

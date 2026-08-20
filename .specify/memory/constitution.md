@@ -1,1 +1,0 @@
-C:/Users/Rob/.claude/constitution.md
