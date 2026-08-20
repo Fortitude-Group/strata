@@ -16,33 +16,42 @@ see the **Claude-Flow Parallel Orchestration** section for the fan-out plan the 
 
 ## Implementation status (as of 2026-08-20)
 
-**US1 is functionally complete** — the full two-signal engine is built, wired, and verified: `dotnet
-build` clean (0 warnings / 0 errors, all 12 projects) and **23/23 tests green**. `strata scan <elf>`
-runs ingest → **function recovery (Iced x86-64 linear sweep) → CFG build → CFG-shape + normalised-
-instruction MinHash fingerprints → LSH function matching fused with the string/constant signal
-(noisy-OR confidence)** → CycloneDX 1.6 + SPDX 2.3 with per-component evidence, honest **per-function**
-unidentified regions, deterministic output, and pipeline exit codes. **46 tasks marked `[X]`.**
+**All six user stories are represented in working, tested code — 81/104 tasks `[X]`.** Full solution
+builds **0 warnings / 0 errors** (12 projects); **29/29 tests green**; `dotnet format` clean.
 
-**Verified working**: Iced decodes real x86-64; branching functions yield multi-block CFGs; identical
-functions match their corpus signature via MinHash/LSH while structurally different ones do not;
-unmatched functions surface as precise unidentified regions (SC-008).
+**Working & verified end-to-end:**
+- **US1** — ingest (ELF/PE/Mach-O) → x86-64 function recovery (Iced) → CFG → CFG-shape + instruction
+  MinHash fingerprints → LSH function matching fused with the string/constant signal (noisy-OR) →
+  CycloneDX 1.6 + SPDX 2.3 with evidence, per-function unidentified regions, deterministic output.
+- **US2** — version resolution intersects present-function ranges for the tightest honest bound; exact
+  banner wins; numeric-aware comparator (1.2.11 > 1.2.9).
+- **US3** — reproducible corpus builder (identical rebuild hash) + benchmark harness with Checkpoint A/B
+  gates (via parallel agent).
+- **US4** — self-contained single-file publish (4 RIDs) + runtime-free container (real docker run/scan
+  verified) + `action.yml` + release workflow (via parallel agent).
+- **US5** — CVE cross-reference (embedded OSV snapshot, range-aware) wired into scanner → CycloneDX
+  `vulnerabilities[]` + SPDX + report + exit code 2; verified in the real CLI on PE/Mach-O fixtures.
+- **US6** — Blazor Server demo: progressive reveal, 8 MiB cap, in-memory/no-retention, per-IP throttle,
+  3 bundled samples (via parallel agent).
+- **Phase 10** — PE (COFF) + Mach-O (64-bit) readers; FR-001 complete across all three formats.
 
-**Honest gaps in the `[X]` set:**
-- **AArch64 decoding (T034, Capstone)** not done — x86-64 only; non-x86 targets degrade cleanly to the
-  string signal. Symbol-driven recovery is a linear-sweep approximation (prologue/symbol refinement pending).
-- **Function-level matching needs a real function corpus to bite**: the seed corpus is string-based, so
-  function matching is proven on synthetic corpora in tests. Populating real function signatures is the
-  corpus builder's job (T059–T063, not yet built) against actually-compiled libraries.
-- **File-location deviations** (functionally done, different file): T037 string signal lives in
-  `Matching/StringEvidenceMatcher.cs`; T018 LSH is `Core/Fingerprinting/LshIndex.cs` (not `Corpus/Index/`);
-  T016/T017 corpus code is `CorpusSchema/CorpusWriter/SqliteCorpus.cs`; T021 seed is `SeedCorpus.cs`;
-  tests live in `tests/Strata.*.Tests/`.
-- **Dependency deviations**: Iced + Microsoft.Data.Sqlite + CycloneDX.Core + Spectre.Console pinned;
-  Capstone/ONNX/System.CommandLine not yet (hand-rolled CLI parser); FluentAssertions dropped (v8
-  commercial licence) in favour of xUnit asserts. T019/T022 (structured logging, fixture-build script)
-  deferred. **T001 GitHub remote NOT pushed** — local repo only, per owner instruction (build full app
-  privately first).
-- **US2–US6, Phase 10 (PE/Mach-O), and Polish are not started.**
+**Genuinely remaining (infrastructure-gated or deferred, NOT silently dropped):**
+- **Production corpus + ML (T069–T072)**: the learned embedding signal and the *real* Checkpoint A/B
+  precision/recall gate both need a corpus built from actually-compiled libraries (the Docker build
+  farm run on real sources). The corpus-builder + benchmark *code* exists and is proven on synthetic
+  fixtures; only the populated artefact is missing. Function-level matching is likewise proven on
+  synthetic corpora until that corpus is built.
+- **AArch64 decoding (T034, Capstone)** — x86-64 only; non-x86 degrades cleanly to the string signal.
+- **Deferred**: structured logging (T019), fixture/CI/web *automated* test scripts (T022/T076/T089 —
+  verified manually/by agents but not committed as test projects), assorted polish (T092–T098),
+  PE/Mach-O corpus targets + fixtures (T102–T104), dependency-pin formalities (T005/T007 — deviated:
+  hand-rolled CLI parser, no ONNX/Capstone/System.CommandLine yet; FluentAssertions dropped as
+  commercially licensed).
+- **File-location deviations** (functionally done, different file): T037 string signal in
+  `Matching/StringEvidenceMatcher.cs`; T018 LSH in `Core/Fingerprinting/`; corpus code in
+  `CorpusSchema/CorpusWriter/SqliteCorpus.cs`; seed in `SeedCorpus.cs`; tests in `tests/Strata.*.Tests/`.
+- **T001 GitHub remote NOT pushed** — local repo only, per owner instruction (build full app privately
+  first).
 
 ## Format: `[ID] [P?] [Story] Description with file path`
 
